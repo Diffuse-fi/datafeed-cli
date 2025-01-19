@@ -1,0 +1,15 @@
+# Compiler files
+cache/
+out/
+
+# pycache
+*__pycache__*
+
+# Development broadcast logs
+broadcast/
+
+# Datafeed data
+data/
+
+# Local addresses change every time
+addresses/local/
