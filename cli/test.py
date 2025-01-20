@@ -33,29 +33,36 @@ def test(test_data, binance_zk_bonsai, binance_zk_local):
     for p in pair_name_enum:
         request_storage_addresses(LOCAL_NETWORK, p.value)
 
+
     step+=1
-    print(f"step {step}: copy test data to working directory...")
-    prepare_json(LOCAL_NETWORK, test_data, binance_zk_bonsai, binance_zk_local)
+    print(f"step {step}: request data from binance...")
+    prepare_json(LOCAL_NETWORK, False, True, False, False)
 
     step+=1
     print(f"step {step}: Print traces of feeding execution...")
-    feed_data_legacy(LOCAL_NETWORK, True)
+    feed_data(LOCAL_NETWORK, is_zk=False, trace=True)
 
     step+=1
-    print(f"step {step}: feed feeder and check rounds amount in storage contract...")
-    feed_data(LOCAL_NETWORK, False)
+    print(f"step {step}: Feed feeder (onchain) and check rounds amount in storage contract...")
+    feed_data(LOCAL_NETWORK, is_zk=False, trace=False)
     rounds_amount = do_request(pair_name_enum.BTCUSDT, LOCAL_NETWORK, method_enum.LATEST_ROUND).strip()
     assert rounds_amount == "0", "rounds amount must be 0 after upload, but it is " + rounds_amount + " something is wrong"
 
-    step+=1
-    print(f"step {step}: feed feeder and check rounds amount in storage contract again...")
-    feed_data(LOCAL_NETWORK, False)
-    rounds_amount = do_request(pair_name_enum.BTCUSDT, LOCAL_NETWORK, method_enum.LATEST_ROUND).strip()
-    assert rounds_amount == "1", "rounds amount must be 1 after upload, but it is " + rounds_amount + " something is wrong"
 
     step+=1
-    print(f"step {step}: feed feeder legacy (neon compatible)...")
-    feed_data_legacy(LOCAL_NETWORK, False)
+    print(f"step {step}: request data from binance...")
+    prepare_json(LOCAL_NETWORK, False, False, binance_zk_bonsai, binance_zk_local)
+
+    step+=1
+    print(f"step {step}: Print traces of feeding execution(zk)...")
+    feed_data(LOCAL_NETWORK, is_zk=True, trace=True)
+
+    step+=1
+    print(f"step {step}: Feed feeder (onchain) and check rounds amount in storage contract...")
+    feed_data(LOCAL_NETWORK, is_zk=True, trace=False)
+    rounds_amount = do_request(pair_name_enum.BTCUSDT, LOCAL_NETWORK, method_enum.LATEST_ROUND).strip()
+    assert rounds_amount == "1", "rounds amount must be 0 after upload, but it is " + rounds_amount + " something is wrong"
+
 
     step+=1
     print(f"step {step}: request storages...")

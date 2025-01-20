@@ -55,9 +55,9 @@ Parse price data (example for local network, on-chain zk verification and provin
 python3 cli/parse_and_prove.py -n local --binance-zk-bonsai
 ```
 
-Publish data on chain (example for local network):
+Publish data on chain (example for local network using zk proof from zkVM):
 ```
-python3 cli/feed_feeder.py -n local
+python3 cli/feed_feeder.py -n local --zk
 ```
 
 Request data from chain (example for requesting latest round data for BTCUSDT from local network):

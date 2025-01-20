@@ -15,13 +15,14 @@ def find_latest_data():
     return latest_data
 
 
-def feed_data(net, trace):
+def feed_data(net, is_zk, trace):
     if trace == True:
-        feed_data_legacy(net, True)
+        feed_data_legacy(net, is_zk, True)
+        return
     if net == NEON_DEVNET:
-        feed_data_legacy(net, False)
+        feed_data_legacy(net, is_zk, False)
     else:
-        feed_data_legacy(net, False)
+        feed_data_legacy(net, is_zk, False)
         # feed_data_publisher(net) // is deprecated, not needed anymore, will be just legacy feeder for now
         # should move to python web3 package I think
 
@@ -48,27 +49,35 @@ def text_array_from_binary_file(filename, isdigit):
     return array
 
 
-def feed_data_legacy(net, trace):
+def feed_data_legacy(net, is_zk, trace):
     latest_data_dir = "data/" + str(find_latest_data()) + "/"
 
     pairs = text_array_from_binary_file(latest_data_dir + "pairs.bin", False)
     prices = text_array_from_binary_file(latest_data_dir + "prices.bin", True)
     timestamps = text_array_from_binary_file(latest_data_dir + "timestamps.bin", True)
 
+    if is_zk == True:
+        with open(latest_data_dir + "sgx_verification_seal.bin", "rb") as file:
+            bin_sgx_verification_seal = file.read()
+            hex_sgx_verification_seal = '0x' + bin_sgx_verification_seal.hex()
 
-    with open(latest_data_dir + "sgx_verification_seal.bin", "rb") as file:
-        bin_sgx_verification_seal = file.read()
-        hex_sgx_verification_seal = '0x' + bin_sgx_verification_seal.hex()
+        with open(latest_data_dir + "sgx_verification_journal.bin", "rb") as file:
+            bin_sgx_verification_journal = file.read()
+            if bin_sgx_verification_journal:
+                hex_sgx_verification_journal = '0x' + bin_sgx_verification_journal.hex()
+    else:
+        with open(latest_data_dir + "sgx_quote.bin", "rb") as file:
+            bin_sgx_quote = file.read()
+            hex_sgx_quote = '0x' + bin_sgx_quote.hex()
 
-    with open(latest_data_dir + "sgx_verification_journal.bin", "rb") as file:
-        bin_sgx_verification_journal = file.read()
-        if bin_sgx_verification_journal:
-            hex_sgx_verification_journal = '0x' + bin_sgx_verification_journal.hex()
 
     with open("pairs/amount.txt", "r") as file:
         pairs_amount = file.read().strip()
 
-    method_signature = "set(string[" + pairs_amount + "] calldata pair_names,uint256[" + pairs_amount + "] calldata prices,uint256[" + pairs_amount + "] calldata timestamps,bytes calldata sgx_verification_journal,bytes calldata sgx_verification_seal)"
+    if is_zk == True:
+        method_signature = "set_zk(string[" + pairs_amount + "] calldata pair_names,uint256[" + pairs_amount + "] calldata prices,uint256[" + pairs_amount + "] calldata timestamps,bytes calldata sgx_verification_journal,bytes calldata sgx_verification_seal)"
+    else:
+        method_signature = "set_onchain(string[" + pairs_amount + "] calldata pair_names,uint256[" + pairs_amount + "] calldata prices,uint256[" + pairs_amount + "] calldata timestamps,bytes calldata sgx_quote)"
 
     command = [
         "cast",
@@ -80,10 +89,13 @@ def feed_data_legacy(net, trace):
         method_signature,
         pairs,
         prices,
-        timestamps,
-        hex_sgx_verification_journal,
-        hex_sgx_verification_seal
+        timestamps
     ]
+    if is_zk == True:
+        command.append(hex_sgx_verification_journal)
+        command.append(hex_sgx_verification_seal)
+    else:
+        command.append(hex_sgx_quote)
 
     if trace == True:
         command[1] = "call"
@@ -97,9 +109,15 @@ def main():
     parser = argparse.ArgumentParser(description="Data feeder parameters")
     parser.add_argument('-n', '--network', type=network_class, required=True, help="Choose network (local, sepolia, eth_mainnet, neon_devnet)")
     parser.add_argument('--trace', action='store_true', default=False, help="Print trace level logs using 'cast call --trace'")
+
+    parser.add_argument('--zk', action='store_true', default=False, help="Use risc0 groth16 proof of quote verification")
+    parser.add_argument('--onchain', action='store_true', default=False, help="Verify quote onchain")
+
     args = parser.parse_args()
 
-    feed_data(args.network, args.trace)
+    assert args.zk + args.onchain == 1, "Chose zk or onchain quote verification method using --zk or --onchain flag"
+
+    feed_data(args.network, args.zk, args.trace)
 
 if __name__ == "__main__":
     main()
