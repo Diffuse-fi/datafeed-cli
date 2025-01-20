@@ -15,3 +15,10 @@ data/
 
 # Local addresses change every time
 addresses/local/
+
+# .env
+.env
+
+# logs
+cron_log.txt
+feeding_log.txt
