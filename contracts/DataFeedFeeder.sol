@@ -36,7 +36,7 @@ contract DataFeedFeeder {
         }
     }
 
-    function set(
+    function set_zk(
         string[PAIRS_AMOUNT] calldata pair_names,
         uint256[PAIRS_AMOUNT] calldata prices,
         uint256[PAIRS_AMOUNT] calldata timestamps,
@@ -73,12 +73,63 @@ contract DataFeedFeeder {
         require(sgx_verification_journal.length >= 335 + 32, "SGX quote too short");
         bytes memory data_hash_from_sgx = new bytes(32);
         for (uint i = 0; i < 32; i++) {
-            // ugly, but will switch to quote verification inside the zkVM, so ok for now
+            // TODO: maybe extract from verification output, not input?
             data_hash_from_sgx[i] = sgx_verification_journal[335 + i];
         }
 
         require(hashed_input_data ==bytes32(data_hash_from_sgx), "hashed_input_data != data_hash_from_sgx");
+        set(pair_names, prices, timestamps);
+    }
 
+    function set_onchain(
+        string[PAIRS_AMOUNT] calldata pair_names,
+        uint256[PAIRS_AMOUNT] calldata prices,
+        uint256[PAIRS_AMOUNT] calldata timestamps,
+        bytes calldata sgx_quote
+    ) external payable {
+        // payable: sgx_quote_verifier collects fee, but it is 0 on sepolia, so now it will work with msg.value = 0
+
+        // verify sgx_quote
+        (bool success, bytes memory output) = sgx_quote_verifier.verifyAndAttestOnChain{value: msg.value}(sgx_quote);
+        if (!success) {
+            // fail returns bytes(error_string)
+            // success returns custom output type:
+            // https://github.com/automata-network/automata-dcap-attestation/blob/b49a9f296a5e0cd8b1f076ec541b1239199cadd2/contracts/verifiers/V3QuoteVerifier.sol#L154
+            require(success, string(output));
+        }
+
+        // extract hashed input from quote
+        require(sgx_quote.length >= 368 + 32, "SGX quote too short");
+        bytes memory data_hash_from_sgx = new bytes(32);
+        for (uint i = 0; i < 32; i++) {
+            // TODO: maybe extract from verification output, not input?
+            data_hash_from_sgx[i] = sgx_quote[368 + i];
+        }
+
+        bytes32[] memory hashes = new bytes32[](PAIRS_AMOUNT * 3);
+
+        for (uint256 i = 0; i < PAIRS_AMOUNT; i++) {
+            hashes[i*3] = keccak256(abi.encodePacked(pair_names[i]));
+            hashes[i*3 + 1] = keccak256(abi.encodePacked(prices[i]));
+            hashes[i*3 + 2] = keccak256(abi.encodePacked(timestamps[i]));
+        }
+        bytes memory concatenated;
+
+        for (uint256 i = 0; i < hashes.length; i++) {
+            concatenated = abi.encodePacked(concatenated, hashes[i]);
+        }
+
+        bytes32 hashed_input_data = keccak256(concatenated);
+
+        require(hashed_input_data == bytes32(data_hash_from_sgx), "hashed_input_data != data_hash_from_sgx");
+        set(pair_names, prices, timestamps);
+    }
+
+    function set(
+        string[PAIRS_AMOUNT] calldata pair_names,
+        uint256[PAIRS_AMOUNT] calldata prices,
+        uint256[PAIRS_AMOUNT] calldata timestamps
+    ) internal {
         // send round data to storage contracts
         for (uint i = 0; i < pair_names.length; i++) {
             dataFeedStorages[pair_names[i]].setNewRound(prices[i], timestamps[i]);
