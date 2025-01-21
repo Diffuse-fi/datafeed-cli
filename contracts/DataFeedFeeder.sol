@@ -14,7 +14,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.20;
+// taiko does not support MCOPY opcode
+pragma solidity 0.8.20;
 
 import {IAutomataDcapAttestationFee} from "./IAutomataDcapAttestationFee.sol";
 import "./DataFeedStorage.sol";
