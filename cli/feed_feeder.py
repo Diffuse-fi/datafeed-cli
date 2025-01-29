@@ -1,7 +1,7 @@
 import sys
 import argparse
 from utils.network import *
-from lib.sgx_verification_infrastructure_deployer.script.utils.network import *
+from lib.sgx_verifier_deployer.script.utils.network import *
 
 def find_latest_data():
     latest_data = -1

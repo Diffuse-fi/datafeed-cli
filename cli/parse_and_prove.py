@@ -1,8 +1,8 @@
 import sys
 import argparse
 from utils.network import *
-from lib.sgx_verification_infrastructure_deployer.script.utils.functions import parse_env_var
-from lib.sgx_verification_infrastructure_deployer.script.utils.wrapper import PCS_DAO, FMSPC_TCB_DAO, ENCLAVE_ID_DAO, DCAP_ATTESTATION
+from lib.sgx_verifier_deployer.script.utils.functions import parse_env_var
+from lib.sgx_verifier_deployer.script.utils.wrapper import PCS_DAO, FMSPC_TCB_DAO, ENCLAVE_ID_DAO, DCAP_ATTESTATION
 
 def find_latest_data():
     latest_data = -1
@@ -32,10 +32,10 @@ def prepare_json (net, _test_data, _binance_onchain, _binance_zk_bonsai, _binanc
             run_subprocess(["cp", "cli/test_data/0/" + f, new_data_dir + f], "copy" + " cli/test_data/0/" + f + " to" + new_data_dir + f)
         return
     else:
-        parse_env_var(net, PCS_DAO, root="lib/sgx_verification_infrastructure_deployer/")
-        parse_env_var(net, FMSPC_TCB_DAO, root="lib/sgx_verification_infrastructure_deployer/")
-        parse_env_var(net, ENCLAVE_ID_DAO, root="lib/sgx_verification_infrastructure_deployer/")
-        parse_env_var(net, DCAP_ATTESTATION, root="lib/sgx_verification_infrastructure_deployer/")
+        parse_env_var(net, PCS_DAO, root="lib/sgx_verifier_deployer/")
+        parse_env_var(net, FMSPC_TCB_DAO, root="lib/sgx_verifier_deployer/")
+        parse_env_var(net, ENCLAVE_ID_DAO, root="lib/sgx_verifier_deployer/")
+        parse_env_var(net, DCAP_ATTESTATION, root="lib/sgx_verifier_deployer/")
         os.environ["RPC_URL"] = net.rpc_url
 
         run_subprocess(["./lib/sgx-scaffold/target/debug/app-template"], "request from binance using sgx")

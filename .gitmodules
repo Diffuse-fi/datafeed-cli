@@ -1,9 +1,9 @@
-[submodule "lib/sgx-scaffold"]
-	path = lib/sgx-scaffold
-	url = ../../Diffuse-fi/sgx-scaffold.git
+[submodule "lib/zktls-enclave"]
+	path = lib/zktls-enclave
+	url = ../../Diffuse-fi/zktls-enclave.git
 [submodule "lib/automata-dcap-zkvm-cli"]
 	path = lib/automata-dcap-zkvm-cli
 	url = ../../Diffuse-fi/automata-dcap-zkvm-cli.git
-[submodule "lib/sgx_verification_infrastructure_deployer"]
-	path = lib/sgx_verification_infrastructure_deployer
-	url = ../../Diffuse-fi/sgx-verification-infrastructure-deployer.git
+[submodule "lib/sgx_verifier_deployer"]
+	path = lib/sgx_verifier_deployer
+	url = ../../Diffuse-fi/sgx-verifier-deployer

@@ -3,7 +3,7 @@ import subprocess
 import enum
 import argparse
 import sys
-from lib.sgx_verification_infrastructure_deployer.script.utils.network import *
+from lib.sgx_verifier_deployer.script.utils.network import *
 
 # hardcoded pairs
 class pair_name_enum(enum.Enum):

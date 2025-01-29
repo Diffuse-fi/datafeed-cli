@@ -31,7 +31,7 @@ anvil
 ```
 and switch to another tab
 
-5. (optional) Go to cd lib/sgx_verification_infrastructure_deployer/ and deploy infrastructure/update collaterals on chain. Needed if you are working on fresh local node.
+5. (optional) Go to cd lib/sgx_verifier_deployer/ and deploy infrastructure/update collaterals on chain. Needed if you are working on fresh local node.
 
 6. export current location to PYTONPATH:
 ```

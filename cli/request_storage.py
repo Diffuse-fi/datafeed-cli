@@ -2,7 +2,7 @@ import subprocess
 import sys
 from datetime import datetime
 from utils.network import *
-from lib.sgx_verification_infrastructure_deployer.script.utils.network import *
+from lib.sgx_verifier_deployer.script.utils.network import *
 
 class method_enum(enum.Enum):
     DECIMALS = "decimals"

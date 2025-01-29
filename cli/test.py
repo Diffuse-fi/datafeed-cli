@@ -10,7 +10,7 @@ from request_storage import do_request
 from request_storage import method_enum
 from parse_and_prove import prepare_json
 
-from lib.sgx_verification_infrastructure_deployer.script.utils.network import *
+from lib.sgx_verifier_deployer.script.utils.network import *
 
 def test(test_data, binance_zk_bonsai, binance_zk_local):
 

@@ -2,9 +2,9 @@ import subprocess
 import sys
 import os
 from utils.network import *
-from lib.sgx_verification_infrastructure_deployer.script.utils.network import *
-from lib.sgx_verification_infrastructure_deployer.script.utils.functions import parse_env_var
-from lib.sgx_verification_infrastructure_deployer.script.utils.wrapper import DCAP_ATTESTATION
+from lib.sgx_verifier_deployer.script.utils.network import *
+from lib.sgx_verifier_deployer.script.utils.functions import parse_env_var
+from lib.sgx_verifier_deployer.script.utils.wrapper import DCAP_ATTESTATION
 
 def strip_address(addr):
     if addr[:2] != '0x':
@@ -47,7 +47,7 @@ def deploy_data_feeder(net):
 
     are_you_sure_not_local(net)
 
-    parse_env_var(net, DCAP_ATTESTATION, root="lib/sgx_verification_infrastructure_deployer/")
+    parse_env_var(net, DCAP_ATTESTATION, root="lib/sgx_verifier_deployer/")
 
     deployment_command = set_deployment_command(net)
     result = run_subprocess(deployment_command, "DataFeedFeeder deployment")
