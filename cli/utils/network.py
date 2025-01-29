@@ -23,7 +23,7 @@ def parse_pairname(value):
 
 
 def address_path(net, contract):
-    return 'addresses/' + net.dirname + contract + '.txt'
+    return 'addresses/' + net.dirname + contract
 
 def run_subprocess(_command, what):
     print(what + "...", end=" ")

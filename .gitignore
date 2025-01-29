@@ -1,3 +1,5 @@
+.env
+
 # Compiler files
 cache/
 out/

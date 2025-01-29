@@ -34,7 +34,7 @@ def get_request_signature(req):
             return "latestRoundData()(uint80, uint256, uint256, uint256, uint80)"
 
 def do_request(pair, net, req, round=None):
-    file = open('addresses/' + net.dirname + pair.value + '.txt', 'r')
+    file = open(address_path(net, pair.value), 'r')
     storage_address = file.readline().strip()
     file.close()
 
