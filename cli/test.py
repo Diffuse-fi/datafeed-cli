@@ -5,7 +5,6 @@ import sys
 from utils.network import *
 from deploy_feeder import deploy_data_feeder, request_storage_addresses
 from feed_feeder import feed_data
-from feed_feeder import feed_data_legacy
 from request_storage import do_request
 from request_storage import method_enum
 from parse_and_prove import prepare_json
