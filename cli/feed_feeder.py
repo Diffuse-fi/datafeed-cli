@@ -15,17 +15,6 @@ def find_latest_data():
     return latest_data
 
 
-def feed_data(net, is_zk, trace):
-    if trace == True:
-        feed_data_legacy(net, is_zk, True)
-        return
-    if net == NEON_DEVNET:
-        feed_data_legacy(net, is_zk, False)
-    else:
-        feed_data_legacy(net, is_zk, False)
-        # feed_data_publisher(net) // is deprecated, not needed anymore, will be just legacy feeder for now
-        # should move to python web3 package I think
-
 def text_array_from_binary_file(filename, isdigit):
     with open(filename, "rb") as f:
         data = f.read()
@@ -49,7 +38,7 @@ def text_array_from_binary_file(filename, isdigit):
     return array
 
 
-def feed_data_legacy(net, is_zk, trace):
+def feed_data(net, is_zk, trace):
     latest_data_dir = "data/" + str(find_latest_data()) + "/"
 
     pairs = text_array_from_binary_file(latest_data_dir + "pairs.bin", False)
@@ -83,7 +72,6 @@ def feed_data_legacy(net, is_zk, trace):
         "cast",
         "send",
         "--private-key=" + os.getenv("ETH_WALLET_PRIVATE_KEY"),
-        "--legacy",
         "--rpc-url=" + net.rpc_url,
         get_feeder_address(net),
         method_signature,
