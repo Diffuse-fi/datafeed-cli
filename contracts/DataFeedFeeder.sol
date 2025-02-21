@@ -19,6 +19,8 @@ pragma solidity 0.8.20;
 
 import {IAutomataDcapAttestationFee} from "./IAutomataDcapAttestationFee.sol";
 import "./DataFeedStorage.sol";
+import "../lib/sgx_verifier_deployer/lib/automata-dcap-attestation/contracts/types/Constants.sol";
+import {BytesUtils} from "../lib/sgx_verifier_deployer/lib/automata-on-chain-pccs/src/utils/BytesUtils.sol";
 
 contract DataFeedFeeder {
     IAutomataDcapAttestationFee public immutable sgx_quote_verifier;
@@ -100,11 +102,19 @@ contract DataFeedFeeder {
         }
 
         // extract hashed input from quote
-        require(sgx_quote.length >= 368 + 32, "SGX quote too short");
+        // enclave report starts after header so we skip first HEADER_LENGTH bytes, next we extract
+        // https://github.com/automata-network/automata-dcap-attestation/blob/3a854a31eb2345a31f9e33697eef0d814d031a12/evm/contracts/bases/QuoteVerifierBase.sol#L64-L76
+        bytes memory mrEnclaveReal = new bytes(32);
+        for (uint i = 0; i < 32; i++) {
+            mrEnclaveReal[i] = sgx_quote[HEADER_LENGTH + 64 + i];
+        }
+        bytes32 mrEnclaveExpected = 0xc1aeaf6d637c85bb0d28bb580054cf5336d79e19f5eff8fa50389715ed112362;
+        require (bytes32(mrEnclaveReal) == mrEnclaveExpected, "mrEnclave from input sgx_quote differs from expected!");
+
+
         bytes memory data_hash_from_sgx = new bytes(32);
         for (uint i = 0; i < 32; i++) {
-            // TODO: maybe extract from verification output, not input?
-            data_hash_from_sgx[i] = sgx_quote[368 + i];
+            data_hash_from_sgx[i] = sgx_quote[HEADER_LENGTH + 320 + i];
         }
 
         bytes32[] memory hashes = new bytes32[](PAIRS_AMOUNT * 3);
