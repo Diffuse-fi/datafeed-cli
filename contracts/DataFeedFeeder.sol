@@ -25,11 +25,14 @@ import {BytesUtils} from "../lib/sgx_verifier_deployer/lib/automata-on-chain-pcc
 contract DataFeedFeeder {
     IAutomataDcapAttestationFee public immutable sgx_quote_verifier;
 
+    address immutable owner;
+
     mapping (string => DataFeedStorage) dataFeedStorages;
     uint constant PAIRS_AMOUNT = 7; // hardcoded pairs
     uint16 constant ENCLAVE_REPORT_OFFSET_OUTPUT = 13;
     uint16 constant MRENCLAVE_OFFSET = 64;
     uint16 constant REPORT_DATA_OFFSET = 320;
+    bytes32 public mrEnclaveExpected = 0xc1aeaf6d637c85bb0d28bb580054cf5336d79e19f5eff8fa50389715ed112362;
 
     constructor(
         IAutomataDcapAttestationFee _sgx_quote_verifier,
@@ -40,17 +43,24 @@ contract DataFeedFeeder {
         for (uint i = 0; i < pair_names.length; i++) {
             dataFeedStorages[pair_names[i]] = new DataFeedStorage(pair_names[i], 8 /* TODO hardcoded*/);
         }
+
+        owner = msg.sender;
     }
 
+    function mrEnclaveUpdate(bytes32 mrEnclaveNew) public {
+        require (msg.sender == owner, "You are not contract owner");
+        mrEnclaveExpected = mrEnclaveNew;
+    }
+
+
     // ecnalveReport starts at ENCLAVE_REPORT_OFFSET_OUTPUT-th byte of the verification output
-    function check_mrenclave(bytes memory verificationOutput) private pure {
+    function check_mrenclave(bytes memory verificationOutput) private view {
         bytes memory mrEnclaveReal = new bytes(32);
         for (uint i = 0; i < 32; i++) {
             // mrenclave starts at byte 64 of enclaveReport and is 32 bytes long
             // https://github.com/automata-network/automata-dcap-attestation/blob/3a854a31eb2345a31f9e33697eef0d814d031a12/evm/contracts/bases/QuoteVerifierBase.sol#L64-L76
             mrEnclaveReal[i] = verificationOutput[ENCLAVE_REPORT_OFFSET_OUTPUT + 64 + i];
         }
-        bytes32 mrEnclaveExpected = 0xc1aeaf6d637c85bb0d28bb580054cf5336d79e19f5eff8fa50389715ed112362;
         require (bytes32(mrEnclaveReal) == mrEnclaveExpected, "mrEnclave from input differs from expected!");
     }
 
