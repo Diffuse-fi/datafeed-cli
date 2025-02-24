@@ -3,7 +3,7 @@ import time
 import sys
 
 from utils.network import *
-from deploy_feeder import deploy_data_feeder, request_storage_addresses
+from deploy_feeder import deploy_data_feeder, set_new_pair, request_storage_address
 from feed_feeder import feed_data
 from request_storage import do_request
 from request_storage import method_enum
@@ -30,7 +30,8 @@ def test(test_data, binance_zk_bonsai, binance_zk_local):
     step+=1
     print(f"step {step}: requesting storage addresses...")
     for p in pair_name_enum:
-        request_storage_addresses(LOCAL_NETWORK, p.value)
+        set_new_pair(LOCAL_NETWORK, p.value)
+        request_storage_address(LOCAL_NETWORK, p.value)
 
 
     step+=1

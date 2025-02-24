@@ -28,22 +28,16 @@ contract DataFeedFeeder {
     address immutable owner;
 
     mapping (string => DataFeedStorage) dataFeedStorages;
-    uint constant PAIRS_AMOUNT = 7; // hardcoded pairs
+
     uint16 constant ENCLAVE_REPORT_OFFSET_OUTPUT = 13;
     uint16 constant MRENCLAVE_OFFSET = 64;
     uint16 constant REPORT_DATA_OFFSET = 320;
     bytes32 public mrEnclaveExpected = 0x4cb40e9053be3f8a7f54a5c46858fe44e37fc7fd66227b280a6f4b15afd947fd;
 
     constructor(
-        IAutomataDcapAttestationFee _sgx_quote_verifier,
-        string[PAIRS_AMOUNT] memory /* array size must be fixed in memory */ pair_names
+        IAutomataDcapAttestationFee _sgx_quote_verifier
     ) {
         sgx_quote_verifier = _sgx_quote_verifier;
-
-        for (uint i = 0; i < pair_names.length; i++) {
-            dataFeedStorages[pair_names[i]] = new DataFeedStorage(pair_names[i], 8 /* TODO hardcoded*/);
-        }
-
         owner = msg.sender;
     }
 
@@ -53,7 +47,7 @@ contract DataFeedFeeder {
     }
 
 
-    // ecnalveReport starts at ENCLAVE_REPORT_OFFSET_OUTPUT-th byte of the verification output
+    // enclaveReport starts at ENCLAVE_REPORT_OFFSET_OUTPUT-th byte of the verification output
     function check_mrenclave(bytes memory verificationOutput) private view {
         bytes memory mrEnclaveReal = new bytes(32);
         for (uint i = 0; i < 32; i++) {
@@ -65,9 +59,9 @@ contract DataFeedFeeder {
     }
 
     function set_zk(
-        string[PAIRS_AMOUNT] calldata pair_names,
-        uint256[PAIRS_AMOUNT] calldata prices,
-        uint256[PAIRS_AMOUNT] calldata timestamps,
+        string[] calldata pair_names,
+        uint256[] calldata prices,
+        uint256[] calldata timestamps,
         bytes calldata sgx_verification_journal,
         bytes calldata sgx_verification_seal
     ) external payable {
@@ -83,9 +77,9 @@ contract DataFeedFeeder {
     }
 
     function set_onchain(
-        string[PAIRS_AMOUNT] calldata pair_names,
-        uint256[PAIRS_AMOUNT] calldata prices,
-        uint256[PAIRS_AMOUNT] calldata timestamps,
+        string[] calldata pair_names,
+        uint256[] calldata prices,
+        uint256[] calldata timestamps,
         bytes calldata sgx_quote
     ) external payable {
 
@@ -101,16 +95,19 @@ contract DataFeedFeeder {
 
     function set(
         bytes memory output,
-        string[PAIRS_AMOUNT] calldata pair_names,
-        uint256[PAIRS_AMOUNT] calldata prices,
-        uint256[PAIRS_AMOUNT] calldata timestamps
+        string[] calldata pair_names,
+        uint256[] calldata prices,
+        uint256[] calldata timestamps
     ) internal {
 
         check_mrenclave(output);
 
-        bytes32[] memory hashes = new bytes32[](PAIRS_AMOUNT * 3);
+        require (pair_names.length == prices.length, "pair_names and prices length mismatch");
+        require (prices.length == timestamps.length, "prices and timestamps length mismatch");
 
-        for (uint256 i = 0; i < PAIRS_AMOUNT; i++) {
+        bytes32[] memory hashes = new bytes32[](pair_names.length * 3);
+
+        for (uint256 i = 0; i < pair_names.length; i++) {
             hashes[i*3] = keccak256(abi.encodePacked(pair_names[i]));
             hashes[i*3 + 1] = keccak256(abi.encodePacked(prices[i]));
             hashes[i*3 + 2] = keccak256(abi.encodePacked(timestamps[i]));
@@ -132,11 +129,22 @@ contract DataFeedFeeder {
 
         // send round data to storage contracts
         for (uint i = 0; i < pair_names.length; i++) {
+            require (
+                address(dataFeedStorages[pair_names[i]]) != address(0),
+                string(abi.encodePacked("storage for pair ", pair_names[i], " is not deployed yet"))
+            );
             dataFeedStorages[pair_names[i]].setNewRound(prices[i], timestamps[i]);
         }
     }
 
-    function getPairStorageAddress(string memory pair_name) external view returns (address) {
+    function setNewPair(string calldata pair_name) external returns (address) {
+        require(address(dataFeedStorages[pair_name]) == address(0), "Storage is already deployed for requested pair");
+        DataFeedStorage newStorage = new DataFeedStorage(pair_name, 8 /* TODO hardcoded*/);
+        dataFeedStorages[pair_name] = newStorage;
+        return address(newStorage);
+    }
+
+    function getPairStorageAddress(string calldata pair_name) external view returns (address) {
         address result = address(dataFeedStorages[pair_name]);
         require(result != address(0), "There is no data for requested pair");
         return result;
