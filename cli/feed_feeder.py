@@ -60,13 +60,10 @@ def feed_data(net, is_zk, trace):
             hex_sgx_quote = '0x' + bin_sgx_quote.hex()
 
 
-    with open("pairs/amount.txt", "r") as file:
-        pairs_amount = file.read().strip()
-
     if is_zk == True:
-        method_signature = "set_zk(string[" + pairs_amount + "] calldata pair_names,uint256[" + pairs_amount + "] calldata prices,uint256[" + pairs_amount + "] calldata timestamps,bytes calldata sgx_verification_journal,bytes calldata sgx_verification_seal)"
+        method_signature = "set_zk(string[] calldata pair_names,uint256[] calldata prices,uint256[] calldata timestamps,bytes calldata sgx_verification_journal,bytes calldata sgx_verification_seal)"
     else:
-        method_signature = "set_onchain(string[" + pairs_amount + "] calldata pair_names,uint256[" + pairs_amount + "] calldata prices,uint256[" + pairs_amount + "] calldata timestamps,bytes calldata sgx_quote)"
+        method_signature = "set_onchain(string[] calldata pair_names,uint256[] calldata prices,uint256[] calldata timestamps,bytes calldata sgx_quote)"
 
     command = [
         "cast",

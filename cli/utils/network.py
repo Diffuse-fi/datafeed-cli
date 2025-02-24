@@ -6,6 +6,7 @@ import sys
 from lib.sgx_verifier_deployer.script.utils.network import *
 
 # hardcoded pairs
+# TODO now this enum and pairs/list.txt duplicate each other
 class pair_name_enum(enum.Enum):
     ETHBTC = "ETHBTC"
     BTCUSDT = "BTCUSDT"
@@ -19,7 +20,7 @@ def parse_pairname(value):
     try:
         return pair_name_enum(value)
     except ValueError:
-        raise argparse.ArgumentTypeError(f"Invalid network: {value}. Possible valies: {[n.value for n in pair_name_enum]}")
+        raise argparse.ArgumentTypeError(f"Invalid pair: {value}. Possible valies: {[n.value for n in pair_name_enum]}")
 
 
 def address_path(net, contract):

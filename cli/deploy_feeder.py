@@ -64,7 +64,7 @@ def deploy_data_feeder(net):
     file.close()
 
 
-def request_storage_addresses(net, pair_name):
+def request_storage_address(net, pair_name):
     # Neon request works successfully only with --trace and returns error without it
     command = [ "cast", "call", "--rpc-url=" + net.rpc_url, get_feeder_address(net), "getPairStorageAddress(string)(address)", pair_name, "--trace"]
 
@@ -78,6 +78,9 @@ def request_storage_addresses(net, pair_name):
 
     print("wrote address to", address_path(net, pair_name), "\n======================================")
 
+def set_new_pair(net, pair_name):
+    command = [ "cast", "send", "--rpc-url=" + net.rpc_url, get_feeder_address(net), "setNewPair(string)(address)", pair_name, "--private-key=" + os.getenv('PRIVATE_KEY')]
+    run_subprocess(command, "set new pair " + pair_name + " in feeder contract")
 
 def main():
     parser = argparse.ArgumentParser(description="Data feeder parameters")
@@ -89,7 +92,8 @@ def main():
     deploy_data_feeder(args.network)
 
     for p in pair_name_enum:
-        request_storage_addresses(args.network, p.value)
+        set_new_pair(args.network, p.value)
+        request_storage_address(args.network, p.value)
 
 if __name__ == "__main__":
     main()
