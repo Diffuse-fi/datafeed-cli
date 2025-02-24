@@ -61,28 +61,11 @@ contract DataFeedFeederDeploy is Script {
 
 
         // Deploy the application contract.
-
-        // Duct tape, but helps to prototype fast --->
-        // hardcoded pairs
-        string[7] memory pair_names;
-        pair_names[0] = "ETHBTC";
-        pair_names[1] = "BTCUSDT";
-        pair_names[2] = "ETHUSDT";
-        pair_names[3] = "ETHUSDC";
-        pair_names[4] = "SOLUSDT";
-        pair_names[5] = "TRUMPUSDT";
-        pair_names[6] = "TRUMPUSDC";
-
-        // <--- Duct tape, but helps to prototype fast
-
         address sgx_quote_verifier_address = vm.envAddress("DCAP_ATTESTATION");
-
-
         sgx_quote_verifier = IAutomataDcapAttestationFee(sgx_quote_verifier_address);
 
         DataFeedFeeder dataFeedFeeder = new DataFeedFeeder(
-            sgx_quote_verifier,
-            pair_names
+            sgx_quote_verifier
         );
         console2.log("Deployed DataFeedFeeder to", address(dataFeedFeeder));
 
