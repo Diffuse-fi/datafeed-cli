@@ -48,7 +48,7 @@ def do_request(pair_name, net, req, round=None):
     if req == method_enum.GET_ROUND_DATA:
         command.append(str(round))
 
-    result = run_subprocess(command, "request method '" + req.value + "' for " + pair.value)
+    result = run_subprocess(command, "request method '" + req.value + "' for " + pair_name)
 
     if req == method_enum.LATEST_ROUND_DATA or req == method_enum.GET_ROUND_DATA:
         result = result.split("\n")

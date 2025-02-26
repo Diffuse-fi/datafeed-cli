@@ -5,22 +5,20 @@ import argparse
 import sys
 from lib.sgx_verifier_deployer.script.utils.network import *
 
-# hardcoded pairs
-# TODO now this enum and pairs/list.txt duplicate each other
-class pair_name_enum(enum.Enum):
-    ETHBTC = "ETHBTC"
-    BTCUSDT = "BTCUSDT"
-    ETHUSDT = "ETHUSDT"
-    ETHUSDC = "ETHUSDC"
-    SOLUSDT = "SOLUSDT"
-    TRUMPUSDT = "TRUMPUSDT"
-    TRUMPUSDC = "TRUMPUSDC"
+all_pairs = []
+with open('pairs/list.txt', 'r') as file:
+    pair_names_list = file.read()
+    pair_names_list = pair_names_list.split('\n')
+    for p in pair_names_list:
+        if p.strip() != '':
+            all_pairs.append(p.strip())
 
-def parse_pairname(value):
-    try:
-        return pair_name_enum(value)
-    except ValueError:
-        raise argparse.ArgumentTypeError(f"Invalid pair: {value}. Possible valies: {[n.value for n in pair_name_enum]}")
+
+def parse_pairname(pair_name):
+    if pair_name in all_pairs:
+        return pair_name
+    else:
+        raise argparse.ArgumentTypeError(f"Invalid pair: {pair_name}. Possible valies: {all_pairs}")
 
 
 def address_path(net, contract):

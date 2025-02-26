@@ -3,7 +3,7 @@ import time
 import sys
 
 from utils.network import *
-from deploy_feeder import deploy_data_feeder, request_storage_address
+from deploy_feeder import deploy_data_feeder
 from feed_feeder import feed_data
 from request_storage import do_request
 from request_storage import method_enum
@@ -23,8 +23,9 @@ def test(test_data, binance_zk_bonsai, binance_zk_local):
 
     step+=1
     print(f"step {step}: clean addresses/local/...")
-    if len(os.listdir("addresses/local/")) > 0:
-        run_subprocess(['rm', 'addresses/local/*'], "rm addresses/local/*")
+    feeder_addr = 'addresses/local/feeder'
+    if os.path.exists(feeder_addr) == True:
+        os.remove(feeder_addr)
 
     step+=1
     print(f"step {step}: deploying datafeed feeder...")
@@ -33,10 +34,9 @@ def test(test_data, binance_zk_bonsai, binance_zk_local):
 
     step+=1
     print(f"step {step}: requesting storage addresses...")
-    for p in pair_name_enum:
-        command = [ "cast", "send", new_feeder, 'setNewPair(string)(address)', p.value, "--rpc-url=" + LOCAL_NETWORK.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
-        run_subprocess(command, "Deploy storage contract for " + p.value + " pair")
-        request_storage_address(LOCAL_NETWORK, p.value)
+    for pair_name in all_pairs:
+        command = [ "cast", "send", new_feeder, 'setNewPair(string)(address)', pair_name, "--rpc-url=" + LOCAL_NETWORK.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
+        run_subprocess(command, "Deploy storage contract for " + pair_name + " pair")
 
 
     step+=1
@@ -50,7 +50,7 @@ def test(test_data, binance_zk_bonsai, binance_zk_local):
     step+=1
     print(f"step {step}: Feed feeder (onchain) and check rounds amount in storage contract...")
     feed_data(LOCAL_NETWORK, is_zk=False, trace=False)
-    rounds_amount = do_request(pair_name_enum.BTCUSDT, LOCAL_NETWORK, method_enum.LATEST_ROUND).strip()
+    rounds_amount = do_request("BTCUSDT", LOCAL_NETWORK, method_enum.LATEST_ROUND).strip()
     assert rounds_amount == "0", "rounds amount must be 0 after upload, but it is " + rounds_amount + " something is wrong"
 
 
@@ -65,18 +65,24 @@ def test(test_data, binance_zk_bonsai, binance_zk_local):
     step+=1
     print(f"step {step}: Feed feeder (onchain) and check rounds amount in storage contract...")
     feed_data(LOCAL_NETWORK, is_zk=True, trace=False)
-    rounds_amount = do_request(pair_name_enum.BTCUSDT, LOCAL_NETWORK, method_enum.LATEST_ROUND).strip()
+    rounds_amount = do_request("BTCUSDT", LOCAL_NETWORK, method_enum.LATEST_ROUND).strip()
     assert rounds_amount == "1", "rounds amount must be 0 after upload, but it is " + rounds_amount + " something is wrong"
 
 
     step+=1
     print(f"step {step}: request storages...")
-    for p in pair_name_enum:
+    for p in all_pairs:
         for m in method_enum:
             if m == method_enum.GET_ROUND_DATA:
                 do_request(p, LOCAL_NETWORK, m, 0)
             else:
                 do_request(p, LOCAL_NETWORK, m)
+
+    step+=1
+    print(f"step {step}: clean addresses/local/...")
+    feeder_addr = 'addresses/local/feeder'
+    if os.path.exists(feeder_addr) == True:
+        os.remove(feeder_addr)
 
 parser = argparse.ArgumentParser(description="test parameters")
 

@@ -24,7 +24,7 @@ import {BytesUtils} from "../lib/sgx_verifier_deployer/lib/automata-on-chain-pcc
 contract DataFeedFeeder {
     IAutomataDcapAttestationFee public immutable sgx_quote_verifier;
 
-    address immutable owner;
+    address public immutable owner;
 
     mapping (string => DataFeedStorage) public dataFeedStorages;
 
@@ -41,12 +41,12 @@ contract DataFeedFeeder {
     }
 
     function mrEnclaveUpdate(bytes32 mrEnclaveNew) public {
-        require (msg.sender == owner, "You are not contract owner");
+        require (msg.sender == owner, "only contract owner can call mrEnclaveUpdate");
         mrEnclaveExpected = mrEnclaveNew;
     }
 
     function transferStorage(string calldata pair_name, address newFeederAddress) external {
-        require (msg.sender == owner, "You are not contract owner");
+        require (msg.sender == owner, "only contract owner can call transferStorage");
         DataFeedFeeder(newFeederAddress).setExistingPair(pair_name, address(dataFeedStorages[pair_name]));
         dataFeedStorages[pair_name].transferOwnership(newFeederAddress);
     }
