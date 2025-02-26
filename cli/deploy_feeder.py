@@ -6,18 +6,6 @@ from lib.sgx_verifier_deployer.script.utils.network import *
 from lib.sgx_verifier_deployer.script.utils.functions import parse_env_var
 from lib.sgx_verifier_deployer.script.utils.wrapper import DCAP_ATTESTATION
 
-def strip_address(addr):
-    if addr[:2] != '0x':
-        print("expected address starting from '0x', got", addr)
-
-    if len(addr) == 42:
-        return addr
-    elif len(addr) == 66:
-        return '0x' + addr[66 - 42 + 2: ]
-    else:
-        print("expected ethereum address, got", addr)
-        sys.exit(1)
-
 
 def are_you_sure_not_local(net):
     if net == LOCAL_NETWORK:
@@ -64,21 +52,6 @@ def deploy_data_feeder(net):
     file.close()
 
 
-def request_storage_address(net, pair_name):
-    # Neon request works successfully only with --trace and returns error without it
-    command = [ "cast", "call", "--rpc-url=" + net.rpc_url, get_feeder_address(net), "getPairStorageAddress(string)(address)", pair_name, "--trace"]
-
-    result = run_subprocess(command, "request DataFeedStorage address for " + pair_name + " ")
-    result = result.split("[Return] ")[1].split("\n")[0]
-    result = strip_address(result)
-
-    file = open(address_path(net, pair_name), 'w')
-    file.write(result.strip())
-    file.close()
-
-    print("wrote address to", address_path(net, pair_name), "\n======================================")
-
-
 def manage_storage_contract(net, prev_feeder, new_feeder, pair_name):
     ownership_transfer_command = [ "cast", "send", prev_feeder, 'transferStorage(string calldata pair_name, address newFeederAddress)', pair_name, new_feeder, "--rpc-url=" + net.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
     new_deployment_command = [ "cast", "send", new_feeder, 'setNewPair(string)(address)', pair_name, "--rpc-url=" + net.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
@@ -111,8 +84,8 @@ def main():
     print("previous_feeder:", previous_feeder)
     print("new_feeder:", new_feeder)
 
-    for p in pair_name_enum:
-        manage_storage_contract(args.network, previous_feeder, new_feeder, p.value)
+    for pair_name in all_pairs:
+        manage_storage_contract(args.network, previous_feeder, new_feeder, pair_name)
 
 
 if __name__ == "__main__":
