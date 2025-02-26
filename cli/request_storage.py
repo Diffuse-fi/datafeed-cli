@@ -33,10 +33,8 @@ def get_request_signature(req):
         case method_enum.LATEST_ROUND_DATA:
             return "latestRoundData()(uint80, uint256, uint256, uint256, uint80)"
 
-def do_request(pair, net, req, round=None):
-    file = open(address_path(net, pair.value), 'r')
-    storage_address = file.readline().strip()
-    file.close()
+def do_request(pair_name, net, req, round=None):
+    storage_address =  call_contract(net, get_feeder_address(net), "getPairStorageAddress(string)(address)", [pair_name], is_address=True)
 
     print("requesting method", req.value)
 

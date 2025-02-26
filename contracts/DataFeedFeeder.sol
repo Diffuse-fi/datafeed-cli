@@ -19,7 +19,6 @@ pragma solidity 0.8.20;
 
 import {IAutomataDcapAttestationFee} from "./IAutomataDcapAttestationFee.sol";
 import "./DataFeedStorage.sol";
-import "../lib/sgx_verifier_deployer/lib/automata-dcap-attestation/contracts/types/Constants.sol";
 import {BytesUtils} from "../lib/sgx_verifier_deployer/lib/automata-on-chain-pccs/src/utils/BytesUtils.sol";
 
 contract DataFeedFeeder {
@@ -27,7 +26,7 @@ contract DataFeedFeeder {
 
     address immutable owner;
 
-    mapping (string => DataFeedStorage) dataFeedStorages;
+    mapping (string => DataFeedStorage) public dataFeedStorages;
 
     uint16 constant ENCLAVE_REPORT_OFFSET_OUTPUT = 13;
     uint16 constant MRENCLAVE_OFFSET = 64;
@@ -46,6 +45,11 @@ contract DataFeedFeeder {
         mrEnclaveExpected = mrEnclaveNew;
     }
 
+    function transferStorage(string calldata pair_name, address newFeederAddress) external {
+        require (msg.sender == owner, "You are not contract owner");
+        DataFeedFeeder(newFeederAddress).setExistingPair(pair_name, address(dataFeedStorages[pair_name]));
+        dataFeedStorages[pair_name].transferOwnership(newFeederAddress);
+    }
 
     // enclaveReport starts at ENCLAVE_REPORT_OFFSET_OUTPUT-th byte of the verification output
     function check_mrenclave(bytes memory verificationOutput) private view {
@@ -142,6 +146,11 @@ contract DataFeedFeeder {
         DataFeedStorage newStorage = new DataFeedStorage(pair_name, 8 /* TODO hardcoded*/);
         dataFeedStorages[pair_name] = newStorage;
         return address(newStorage);
+    }
+
+    function setExistingPair(string calldata pairName, address pairAddr) external {
+        require(address(dataFeedStorages[pairName]) == address(0), "Storage is already deployed for requested pair");
+        dataFeedStorages[pairName] = DataFeedStorage(pairAddr);
     }
 
     function getPairStorageAddress(string calldata pair_name) external view returns (address) {

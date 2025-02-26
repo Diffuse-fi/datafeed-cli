@@ -3,7 +3,7 @@ import time
 import sys
 
 from utils.network import *
-from deploy_feeder import deploy_data_feeder, set_new_pair, request_storage_address
+from deploy_feeder import deploy_data_feeder, request_storage_address
 from feed_feeder import feed_data
 from request_storage import do_request
 from request_storage import method_enum
@@ -16,21 +16,26 @@ def test(test_data, binance_zk_bonsai, binance_zk_local):
     assert test_data + binance_zk_bonsai + binance_zk_local == 1, "test requires exactly one flag"
 
     step = 0
-    step+=1
     print(f"step {step}: set env variables...")
     anvil_testnet_private_key = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
     os.environ["ETH_WALLET_PRIVATE_KEY"] = anvil_testnet_private_key
     os.environ["ALCHEMY_API_KEY"] = "placeholder"
 
+    step+=1
+    print(f"step {step}: clean addresses/local/...")
+    if len(os.listdir("addresses/local/")) > 0:
+        run_subprocess(['rm', 'addresses/local/*'], "rm addresses/local/*")
 
     step+=1
     print(f"step {step}: deploying datafeed feeder...")
     deploy_data_feeder(LOCAL_NETWORK)
+    new_feeder = get_feeder_address(LOCAL_NETWORK)
 
     step+=1
     print(f"step {step}: requesting storage addresses...")
     for p in pair_name_enum:
-        set_new_pair(LOCAL_NETWORK, p.value)
+        command = [ "cast", "send", new_feeder, 'setNewPair(string)(address)', p.value, "--rpc-url=" + LOCAL_NETWORK.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
+        run_subprocess(command, "Deploy storage contract for " + p.value + " pair")
         request_storage_address(LOCAL_NETWORK, p.value)
 
 

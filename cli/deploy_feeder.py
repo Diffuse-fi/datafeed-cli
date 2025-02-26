@@ -78,9 +78,24 @@ def request_storage_address(net, pair_name):
 
     print("wrote address to", address_path(net, pair_name), "\n======================================")
 
-def set_new_pair(net, pair_name):
-    command = [ "cast", "send", "--rpc-url=" + net.rpc_url, get_feeder_address(net), "setNewPair(string)(address)", pair_name, "--private-key=" + os.getenv('PRIVATE_KEY')]
-    run_subprocess(command, "set new pair " + pair_name + " in feeder contract")
+
+def manage_storage_contract(net, prev_feeder, new_feeder, pair_name):
+    ownership_transfer_command = [ "cast", "send", prev_feeder, 'transferStorage(string calldata pair_name, address newFeederAddress)', pair_name, new_feeder, "--rpc-url=" + net.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
+    new_deployment_command = [ "cast", "send", new_feeder, 'setNewPair(string)(address)', pair_name, "--rpc-url=" + net.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
+
+    if prev_feeder is not None:
+        storage_address = call_contract(net, prev_feeder, 'dataFeedStorages(string)(address)', [pair_name], is_address=True)
+        if int(storage_address, 16) == 0:
+            run_subprocess(new_deployment_command, "Deploy storage contract for " + pair_name + " pair")
+        else:
+            storage_owner = call_contract(net, prev_feeder, 'owner()(address)', [], is_address=True)
+            if storage_owner != new_feeder:
+                run_subprocess(ownership_transfer_command, "Transfer ownership to new feeder for " + pair_name + " pair")
+            else:
+                print("new_feeder already owns storage of", pair_name)
+    else:
+        run_subprocess(new_deployment_command, "Deploy storage contract for " + pair_name + " pair")
+
 
 def main():
     parser = argparse.ArgumentParser(description="Data feeder parameters")
@@ -88,12 +103,17 @@ def main():
 
     args = parser.parse_args()
 
-
+    previous_feeder = None
+    if os.path.isfile(address_path(args.network, "feeder")) == True:
+        previous_feeder = get_feeder_address(args.network)
     deploy_data_feeder(args.network)
+    new_feeder = get_feeder_address(args.network)
+    print("previous_feeder:", previous_feeder)
+    print("new_feeder:", new_feeder)
 
     for p in pair_name_enum:
-        set_new_pair(args.network, p.value)
-        request_storage_address(args.network, p.value)
+        manage_storage_contract(args.network, previous_feeder, new_feeder, p.value)
+
 
 if __name__ == "__main__":
     main()
