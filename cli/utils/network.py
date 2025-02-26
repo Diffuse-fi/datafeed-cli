@@ -50,3 +50,27 @@ def get_feeder_address(net):
     file.close()
 
     return data_feeder_address
+
+def strip_address(addr):
+    if addr[:2] != '0x':
+        print("expected address starting from '0x', got", addr)
+
+    if len(addr) == 42:
+        return addr
+    elif len(addr) == 66:
+        return '0x' + addr[66 - 42 + 2: ]
+    else:
+        print("expected ethereum address, got", addr)
+        sys.exit(1)
+
+
+def request_storage_address(net, pair_name):
+    # Neon request works successfully only with --trace and returns error without it
+    command = [ "cast", "call", "--rpc-url=" + net.rpc_url, get_feeder_address(net), "getPairStorageAddress(string)(address)", pair_name, "--trace"]
+
+    result = run_subprocess(command, "request DataFeedStorage address for " + pair_name + " ")
+    result = result.split("[Return] ")[1].split("\n")[0]
+    result = strip_address(result)
+
+    address = result.strip()
+    return address
