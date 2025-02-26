@@ -36,6 +36,11 @@ contract DataFeedStorage {
 
     event NewRoundEvent(uint256 roundId);
 
+    function transferOwnership(address newOwner) public {
+        require(msg.sender == owner, "Only storage owner can transfer ownership");
+        owner = newOwner;
+    }
+
 	function decimals() external view returns (uint8) {
         return decimals_amount;
     }
