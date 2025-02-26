@@ -75,8 +75,8 @@ def main():
     print("previous_feeder:", previous_feeder)
     print("new_feeder:", new_feeder)
 
-    for p in pair_name_enum:
-        manage_storage_contract(args.network, previous_feeder, new_feeder, p.value)
+    for pair_name in all_pairs:
+        manage_storage_contract(args.network, previous_feeder, new_feeder, pair_name)
 
 
 if __name__ == "__main__":
