@@ -46,6 +46,11 @@ contract DataFeedFeeder {
         mrEnclaveExpected = mrEnclaveNew;
     }
 
+    function transferStorage(string calldata pair_name, address newFeederAddress) external {
+        require (msg.sender == owner, "You are not contract owner");
+        DataFeedFeeder(newFeederAddress).setExistingPair(pair_name, address(dataFeedStorages[pair_name]));
+        dataFeedStorages[pair_name].transferOwnership(newFeederAddress);
+    }
 
     // enclaveReport starts at ENCLAVE_REPORT_OFFSET_OUTPUT-th byte of the verification output
     function check_mrenclave(bytes memory verificationOutput) private view {
@@ -142,6 +147,11 @@ contract DataFeedFeeder {
         DataFeedStorage newStorage = new DataFeedStorage(pair_name, 8 /* TODO hardcoded*/);
         dataFeedStorages[pair_name] = newStorage;
         return address(newStorage);
+    }
+
+    function setExistingPair(string calldata pairName, address pairAddr) external {
+        require(address(dataFeedStorages[pairName]) == address(0), "Storage is already deployed for requested pair");
+        dataFeedStorages[pairName] = DataFeedStorage(pairAddr);
     }
 
     function getPairStorageAddress(string calldata pair_name) external view returns (address) {
