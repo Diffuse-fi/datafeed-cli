@@ -137,7 +137,7 @@ contract DataFeedFeeder {
                 address(dataFeedStorages[pair_names[i]]) != address(0),
                 string(abi.encodePacked("storage for pair ", pair_names[i], " is not deployed yet"))
             );
-            dataFeedStorages[pair_names[i]].setNewRound(prices[i], timestamps[i]);
+            dataFeedStorages[pair_names[i]].setNewRound(int256(prices[i]), timestamps[i]);
         }
     }
 
