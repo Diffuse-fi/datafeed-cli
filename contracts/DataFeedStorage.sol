@@ -17,7 +17,7 @@
 pragma solidity ^0.8.20;
 
 struct RoundData {
-    uint256 answer;
+    int256 answer;
     uint256 timestamp;
 }
 
@@ -49,7 +49,7 @@ contract DataFeedStorage {
         return description_string;
     }
 
-	function latestAnswer() external view returns (uint256) {
+	function latestAnswer() external view returns (int256) {
         require(roundDataArray.length != 0, "there has been no rounds yet");
         return roundDataArray[roundDataArray.length - 1].answer;
     }
@@ -60,25 +60,25 @@ contract DataFeedStorage {
         return _latest_round;
     }
 
-	function getRoundData(uint80 _roundId) external view returns (uint80 roundId, uint256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) {
+	function getRoundData(uint80 _roundId) external view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) {
         require(roundDataArray.length != 0, "there has been no rounds yet");
-        uint256 _answer = roundDataArray[_roundId].answer;
+        int256 _answer = roundDataArray[_roundId].answer;
         uint256 _timestamp = roundDataArray[_roundId].timestamp;
         uint80 latest_round = uint80(roundDataArray.length - 1);
 
         return (_roundId, _answer, _timestamp, _timestamp, latest_round);
     }
 
-	function latestRoundData() external view returns (uint80 roundId, uint256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) {
+	function latestRoundData() external view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) {
         require(roundDataArray.length != 0, "there has been no rounds yet");
         uint80 _latest_round = uint80(roundDataArray.length - 1);
-        uint256 _answer = roundDataArray[_latest_round].answer;
+        int256 _answer = roundDataArray[_latest_round].answer;
         uint256 _timestamp = roundDataArray[_latest_round].timestamp;
 
         return (_latest_round, _answer, _timestamp, _timestamp, _latest_round);
     }
 
-    function setNewRound(uint256 answer, uint256 timestamp) public {
+    function setNewRound(int256 answer, uint256 timestamp) public {
         require(msg.sender == owner, "Only storage owner can add new data");
         roundDataArray.push(RoundData(answer, timestamp));
         emit NewRoundEvent(roundDataArray.length - 1);
