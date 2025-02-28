@@ -62,13 +62,21 @@ def strip_address(addr):
         sys.exit(1)
 
 
-def request_storage_address(net, pair_name):
+def call_contract(net, address, signature, params, is_address=False):
+    command = [ "cast", "call", "--rpc-url=" + net.rpc_url, address]
+    command.append(signature)
+    arguments = ""
+    for p in params:
+        command.append(p)
+        arguments += p
     # Neon request works successfully only with --trace and returns error without it
-    command = [ "cast", "call", "--rpc-url=" + net.rpc_url, get_feeder_address(net), "getPairStorageAddress(string)(address)", pair_name, "--trace"]
+    command.append('--trace')
 
-    result = run_subprocess(command, "request DataFeedStorage address for " + pair_name + " ")
+    result = run_subprocess(command, "call " + signature + " with arguments " + arguments)
     result = result.split("[Return] ")[1].split("\n")[0]
-    result = strip_address(result)
+    if is_address==True:
+        result = strip_address(result)
+    result = result.strip()
 
-    address = result.strip()
-    return address
+    return result
+

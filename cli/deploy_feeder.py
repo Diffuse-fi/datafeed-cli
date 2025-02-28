@@ -53,12 +53,21 @@ def deploy_data_feeder(net):
 
 
 def manage_storage_contract(net, prev_feeder, new_feeder, pair_name):
+    ownership_transfer_command = [ "cast", "send", prev_feeder, 'transferStorage(string calldata pair_name, address newFeederAddress)', pair_name, new_feeder, "--rpc-url=" + net.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
+    new_deployment_command = [ "cast", "send", new_feeder, 'setNewPair(string)(address)', pair_name, "--rpc-url=" + net.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
+
     if prev_feeder is not None:
-        command = [ "cast", "send", prev_feeder, 'transferStorage(string calldata pair_name, address newFeederAddress)', pair_name, new_feeder, "--rpc-url=" + net.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
-        run_subprocess(command, "Transfer ownership to new feeder for " + pair_name + " pair")
+        storage_address = call_contract(net, prev_feeder, 'dataFeedStorages(string)(address)', [pair_name], is_address=True)
+        if int(storage_address, 16) == 0:
+            run_subprocess(new_deployment_command, "Deploy storage contract for " + pair_name + " pair")
+        else:
+            storage_owner = call_contract(net, prev_feeder, 'owner()(address)', [], is_address=True)
+            if storage_owner != new_feeder:
+                run_subprocess(ownership_transfer_command, "Transfer ownership to new feeder for " + pair_name + " pair")
+            else:
+                print("new_feeder already owns storage of", pair_name)
     else:
-        command = [ "cast", "send", new_feeder, 'setNewPair(string)(address)', pair_name, "--rpc-url=" + net.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
-        run_subprocess(command, "Deploy storage contract for " + pair_name + " pair")
+        run_subprocess(new_deployment_command, "Deploy storage contract for " + pair_name + " pair")
 
 
 def main():

@@ -34,7 +34,7 @@ def get_request_signature(req):
             return "latestRoundData()(uint80, uint256, uint256, uint256, uint80)"
 
 def do_request(pair_name, net, req, round=None):
-    storage_address = request_storage_address(net, pair_name)
+    storage_address =  call_contract(net, get_feeder_address(net), "getPairStorageAddress(string)(address)", [pair_name], is_address=True)
 
     print("requesting method", req.value)
 
