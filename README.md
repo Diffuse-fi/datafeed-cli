@@ -71,3 +71,6 @@ Request data from chain (example for requesting latest round data for BTCUSDT fr
 ```
 python3 cli/request_storage.py -n local -p BTCUSDT -m latestRoundData
 ```
+
+## How to add new pairs
+Pairs are listed in `pairs/list.txt`, please use `cli/add_new_pair.py` to add new pairs, it checks if pair was already added and is listed on binance.
