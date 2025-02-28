@@ -19,7 +19,6 @@ pragma solidity 0.8.20;
 
 import {IAutomataDcapAttestationFee} from "./IAutomataDcapAttestationFee.sol";
 import "./DataFeedStorage.sol";
-import "../lib/sgx_verifier_deployer/lib/automata-dcap-attestation/contracts/types/Constants.sol";
 import {BytesUtils} from "../lib/sgx_verifier_deployer/lib/automata-on-chain-pccs/src/utils/BytesUtils.sol";
 
 contract DataFeedFeeder {
@@ -27,7 +26,7 @@ contract DataFeedFeeder {
 
     address public immutable owner;
 
-    mapping (string => DataFeedStorage) dataFeedStorages;
+    mapping (string => DataFeedStorage) public dataFeedStorages;
 
     uint16 constant ENCLAVE_REPORT_OFFSET_OUTPUT = 13;
     uint16 constant MRENCLAVE_OFFSET = 64;
