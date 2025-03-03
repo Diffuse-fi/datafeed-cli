@@ -32,7 +32,7 @@ contract DataFeedFeeder {
     uint16 constant ENCLAVE_REPORT_OFFSET_OUTPUT = 13;
     uint16 constant MRENCLAVE_OFFSET = 64;
     uint16 constant REPORT_DATA_OFFSET = 320;
-    bytes32 public mrEnclaveExpected = 0xc1aeaf6d637c85bb0d28bb580054cf5336d79e19f5eff8fa50389715ed112362;
+    bytes32 public mrEnclaveExpected = 0x4cb40e9053be3f8a7f54a5c46858fe44e37fc7fd66227b280a6f4b15afd947fd;
 
     constructor(
         IAutomataDcapAttestationFee _sgx_quote_verifier,
