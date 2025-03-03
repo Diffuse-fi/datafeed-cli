@@ -19,7 +19,6 @@ pragma solidity 0.8.20;
 
 import {IAutomataDcapAttestationFee} from "./IAutomataDcapAttestationFee.sol";
 import "./DataFeedStorage.sol";
-import {BytesUtils} from "../lib/sgx_verifier_deployer/lib/automata-on-chain-pccs/src/utils/BytesUtils.sol";
 
 contract DataFeedFeeder {
     IAutomataDcapAttestationFee public immutable sgx_quote_verifier;
