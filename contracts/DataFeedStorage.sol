@@ -17,8 +17,8 @@
 pragma solidity ^0.8.20;
 
 struct RoundData {
-    int256 answer;
-    uint256 timestamp;
+    int128 answer;
+    uint128 timestamp;
 }
 
 contract DataFeedStorage {
@@ -36,14 +36,14 @@ contract DataFeedStorage {
         owner = msg.sender;
     }
 
-    event NewRoundEvent(uint256 roundId);
+    event NewRoundEvent(uint128 roundId);
 
     function transferOwnership(address newOwner) public {
         require(msg.sender == owner, "Only storage owner can transfer ownership");
         owner = newOwner;
     }
 
-	function latestAnswer() external view returns (int256) {
+	function latestAnswer() external view returns (int128) {
         uint80 _latestRound = latestRound();
         return roundDataArray[_latestRound % ROUNDS_STORAGE_SIZE].answer;
     }
@@ -64,8 +64,8 @@ contract DataFeedStorage {
 
 	function getRoundData(uint80 _roundId) external view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) {
         uint80 index = roundToIndex(_roundId);
-        int256 _answer = roundDataArray[index].answer;
-        uint256 _timestamp = roundDataArray[index].timestamp;
+        int128 _answer = roundDataArray[index].answer;
+        uint128 _timestamp = roundDataArray[index].timestamp;
 
         return (_roundId, _answer, _timestamp, _timestamp, _roundId);
     }
@@ -73,13 +73,13 @@ contract DataFeedStorage {
 	function latestRoundData() external view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) {
         uint80 _latestRound = latestRound();
         uint80 _latestIndex = roundToIndex(_latestRound);
-        int256 _answer = roundDataArray[_latestIndex].answer;
-        uint256 _timestamp = roundDataArray[_latestIndex].timestamp;
+        int128 _answer = roundDataArray[_latestIndex].answer;
+        uint128 _timestamp = roundDataArray[_latestIndex].timestamp;
 
         return (_latestRound, _answer, _timestamp, _timestamp, _latestRound);
     }
 
-    function setNewRound(int256 answer, uint256 timestamp) public {
+    function setNewRound(int128 answer, uint128 timestamp) public {
         require(msg.sender == owner, "Only storage owner can add new data");
         emit NewRoundEvent(roundsAmount);
         roundsAmount = roundsAmount + 1;

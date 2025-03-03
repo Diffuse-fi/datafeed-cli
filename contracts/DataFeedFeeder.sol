@@ -19,7 +19,6 @@ pragma solidity 0.8.20;
 
 import {IAutomataDcapAttestationFee} from "./IAutomataDcapAttestationFee.sol";
 import "./DataFeedStorage.sol";
-import {BytesUtils} from "../lib/sgx_verifier_deployer/lib/automata-on-chain-pccs/src/utils/BytesUtils.sol";
 
 contract DataFeedFeeder {
     IAutomataDcapAttestationFee public immutable sgx_quote_verifier;
@@ -64,8 +63,8 @@ contract DataFeedFeeder {
 
     function set_zk(
         string[] calldata pair_names,
-        uint256[] calldata prices,
-        uint256[] calldata timestamps,
+        uint128[] calldata prices,
+        uint128[] calldata timestamps,
         bytes calldata sgx_verification_journal,
         bytes calldata sgx_verification_seal
     ) external payable {
@@ -82,8 +81,8 @@ contract DataFeedFeeder {
 
     function set_onchain(
         string[] calldata pair_names,
-        uint256[] calldata prices,
-        uint256[] calldata timestamps,
+        uint128[] calldata prices,
+        uint128[] calldata timestamps,
         bytes calldata sgx_quote
     ) external payable {
 
@@ -100,8 +99,8 @@ contract DataFeedFeeder {
     function set(
         bytes memory output,
         string[] calldata pair_names,
-        uint256[] calldata prices,
-        uint256[] calldata timestamps
+        uint128[] calldata prices,
+        uint128[] calldata timestamps
     ) internal {
 
         check_mrenclave(output);
@@ -111,14 +110,14 @@ contract DataFeedFeeder {
 
         bytes32[] memory hashes = new bytes32[](pair_names.length * 3);
 
-        for (uint256 i = 0; i < pair_names.length; i++) {
+        for (uint128 i = 0; i < pair_names.length; i++) {
             hashes[i*3] = keccak256(abi.encodePacked(pair_names[i]));
-            hashes[i*3 + 1] = keccak256(abi.encodePacked(prices[i]));
-            hashes[i*3 + 2] = keccak256(abi.encodePacked(timestamps[i]));
+            hashes[i*3 + 1] = keccak256(abi.encodePacked(uint256(prices[i])));
+            hashes[i*3 + 2] = keccak256(abi.encodePacked(uint256(timestamps[i])));
         }
         bytes memory concatenated;
 
-        for (uint256 i = 0; i < hashes.length; i++) {
+        for (uint128 i = 0; i < hashes.length; i++) {
             concatenated = abi.encodePacked(concatenated, hashes[i]);
         }
 
@@ -137,7 +136,7 @@ contract DataFeedFeeder {
                 address(dataFeedStorages[pair_names[i]]) != address(0),
                 string(abi.encodePacked("storage for pair ", pair_names[i], " is not deployed yet"))
             );
-            dataFeedStorages[pair_names[i]].setNewRound(int256(prices[i]), timestamps[i]);
+            dataFeedStorages[pair_names[i]].setNewRound(int128(prices[i]), timestamps[i]);
         }
     }
 

@@ -66,8 +66,8 @@ contract TestDataFeedStorage is Test {
     function testStorageRewriteLatestRoundData() public {
         uint80 LATEST = dataFeedStorage.ROUNDS_STORAGE_SIZE() + 10;
 
-        for (uint256 i = 0; i < LATEST + 1; i++) {
-            dataFeedStorage.setNewRound(int256(i), i*10);
+        for (uint128 i = 0; i < LATEST + 1; i++) {
+            dataFeedStorage.setNewRound(int128(i), i*10);
         }
         (uint80 roundId, int256 answer, uint256 startedAt,,) = dataFeedStorage.getRoundData(LATEST);
         assertEq(roundId, LATEST);
@@ -78,8 +78,8 @@ contract TestDataFeedStorage is Test {
     function testStorageRewriteLatest() public {
         uint80 LATEST = dataFeedStorage.ROUNDS_STORAGE_SIZE() + 10;
 
-        for (uint256 i = 0; i < LATEST + 1; i++) {
-            dataFeedStorage.setNewRound(int256(i), i*10);
+        for (uint128 i = 0; i < LATEST + 1; i++) {
+            dataFeedStorage.setNewRound(int128(i), i*10);
         }
         (uint80 roundId, int256 answer, uint256 startedAt,,) = dataFeedStorage.getRoundData(LATEST);
         assertEq(roundId, LATEST);
@@ -92,8 +92,8 @@ contract TestDataFeedStorage is Test {
         uint80 TOO_SMALL = LATEST - dataFeedStorage.ROUNDS_STORAGE_SIZE();
         uint80 OLDEST = TOO_SMALL + 1;
 
-        for (uint256 i = 0; i < LATEST + 1; i++) {
-            dataFeedStorage.setNewRound(int256(i), i*10);
+        for (uint128 i = 0; i < LATEST + 1; i++) {
+            dataFeedStorage.setNewRound(int128(i), i*10);
         }
         (uint80 roundId, int256 answer, uint256 startedAt,,) = dataFeedStorage.getRoundData(OLDEST);
         assertEq(roundId, OLDEST);
@@ -105,8 +105,8 @@ contract TestDataFeedStorage is Test {
         uint80 LATEST = dataFeedStorage.ROUNDS_STORAGE_SIZE() + 10;
         uint80 TOO_BIG = LATEST + 1;
 
-        for (uint256 i = 0; i < LATEST + 1; i++) {
-            dataFeedStorage.setNewRound(int256(i), i*10);
+        for (uint128 i = 0; i < LATEST + 1; i++) {
+            dataFeedStorage.setNewRound(int128(i), i*10);
         }
         vm.expectRevert("_roundId must be less than roundsAmount");
         dataFeedStorage.getRoundData(TOO_BIG);
@@ -116,8 +116,8 @@ contract TestDataFeedStorage is Test {
         uint80 LATEST = dataFeedStorage.ROUNDS_STORAGE_SIZE() + 10;
         uint80 TOO_SMALL = LATEST - dataFeedStorage.ROUNDS_STORAGE_SIZE();
 
-        for (uint256 i = 0; i < LATEST + 1; i++) {
-            dataFeedStorage.setNewRound(int256(i), i*10);
+        for (uint128 i = 0; i < LATEST + 1; i++) {
+            dataFeedStorage.setNewRound(int128(i), i*10);
         }
         vm.expectRevert("contract stores only ROUNDS_STORAGE_SIZE latest rounds");
         dataFeedStorage.getRoundData(TOO_SMALL);

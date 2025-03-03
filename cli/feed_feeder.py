@@ -61,9 +61,9 @@ def feed_data(net, is_zk, trace):
 
 
     if is_zk == True:
-        method_signature = "set_zk(string[] calldata pair_names,uint256[] calldata prices,uint256[] calldata timestamps,bytes calldata sgx_verification_journal,bytes calldata sgx_verification_seal)"
+        method_signature = "set_zk(string[] calldata pair_names,uint128[] calldata prices,uint128[] calldata timestamps,bytes calldata sgx_verification_journal,bytes calldata sgx_verification_seal)"
     else:
-        method_signature = "set_onchain(string[] calldata pair_names,uint256[] calldata prices,uint256[] calldata timestamps,bytes calldata sgx_quote)"
+        method_signature = "set_onchain(string[] calldata pair_names,uint128[] calldata prices,uint128[] calldata timestamps,bytes calldata sgx_quote)"
 
     command = [
         "cast",
