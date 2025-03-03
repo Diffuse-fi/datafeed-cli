@@ -23,14 +23,16 @@ struct RoundData {
 
 contract DataFeedStorage {
 
-    uint8 decimals_amount;
-    string description_string;
-    RoundData[] public roundDataArray;
+    uint16 constant public ROUNDS_STORAGE_SIZE = 256;
+    uint8 immutable public decimals;
+    uint80 roundsAmount = 0;
     address public owner;
+    string public description;
+    RoundData[ROUNDS_STORAGE_SIZE] roundDataArray;
 
     constructor (string memory _description_string, uint8 _decimals_amount) {
-        description_string = _description_string;
-        decimals_amount = _decimals_amount;
+        description = _description_string;
+        decimals = _decimals_amount;
         owner = msg.sender;
     }
 
@@ -41,46 +43,47 @@ contract DataFeedStorage {
         owner = newOwner;
     }
 
-	function decimals() external view returns (uint8) {
-        return decimals_amount;
-    }
-
-	function description() external view returns (string memory) {
-        return description_string;
-    }
-
 	function latestAnswer() external view returns (int256) {
-        require(roundDataArray.length != 0, "there has been no rounds yet");
-        return roundDataArray[roundDataArray.length - 1].answer;
+        uint80 _latestRound = latestRound();
+        return roundDataArray[_latestRound % ROUNDS_STORAGE_SIZE].answer;
     }
 
-	function latestRound() external view returns (uint256) {
-        require(roundDataArray.length != 0, "there has been no rounds yet");
-        uint80 _latest_round = uint80(roundDataArray.length - 1);
-        return _latest_round;
+	function latestRound() public view returns (uint80) {
+        require(roundsAmount != 0, "there has been no rounds yet");
+        uint80 _latestRound = roundsAmount - 1;
+        return _latestRound;
+    }
+
+	function roundToIndex(uint80 _roundId) internal view returns (uint80) {
+        require(_roundId < roundsAmount, "_roundId must be less than roundsAmount");
+        if (roundsAmount >= ROUNDS_STORAGE_SIZE) {
+            require(_roundId >= roundsAmount - ROUNDS_STORAGE_SIZE, "contract stores only ROUNDS_STORAGE_SIZE latest rounds");
+        }
+        return _roundId % ROUNDS_STORAGE_SIZE;
     }
 
 	function getRoundData(uint80 _roundId) external view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) {
-        require(roundDataArray.length != 0, "there has been no rounds yet");
-        int256 _answer = roundDataArray[_roundId].answer;
-        uint256 _timestamp = roundDataArray[_roundId].timestamp;
-        uint80 latest_round = uint80(roundDataArray.length - 1);
+        uint80 index = roundToIndex(_roundId);
+        int256 _answer = roundDataArray[index].answer;
+        uint256 _timestamp = roundDataArray[index].timestamp;
 
-        return (_roundId, _answer, _timestamp, _timestamp, latest_round);
+        return (_roundId, _answer, _timestamp, _timestamp, _roundId);
     }
 
 	function latestRoundData() external view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) {
-        require(roundDataArray.length != 0, "there has been no rounds yet");
-        uint80 _latest_round = uint80(roundDataArray.length - 1);
-        int256 _answer = roundDataArray[_latest_round].answer;
-        uint256 _timestamp = roundDataArray[_latest_round].timestamp;
+        uint80 _latestRound = latestRound();
+        uint80 _latestIndex = roundToIndex(_latestRound);
+        int256 _answer = roundDataArray[_latestIndex].answer;
+        uint256 _timestamp = roundDataArray[_latestIndex].timestamp;
 
-        return (_latest_round, _answer, _timestamp, _timestamp, _latest_round);
+        return (_latestRound, _answer, _timestamp, _timestamp, _latestRound);
     }
 
     function setNewRound(int256 answer, uint256 timestamp) public {
         require(msg.sender == owner, "Only storage owner can add new data");
-        roundDataArray.push(RoundData(answer, timestamp));
-        emit NewRoundEvent(roundDataArray.length - 1);
+        emit NewRoundEvent(roundsAmount);
+        roundsAmount = roundsAmount + 1;
+        uint80 _latestIndex = roundToIndex(latestRound());
+        roundDataArray[_latestIndex] = RoundData(answer, timestamp);
     }
 }
