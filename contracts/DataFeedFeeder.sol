@@ -21,7 +21,7 @@ import {IAutomataDcapAttestationFee} from "./IAutomataDcapAttestationFee.sol";
 import "./DataFeedStorage.sol";
 
 contract DataFeedFeeder {
-    IAutomataDcapAttestationFee public immutable sgx_quote_verifier;
+    IAutomataDcapAttestationFee public sgxQuoteVerifier;
 
     address public immutable owner;
 
@@ -33,15 +33,20 @@ contract DataFeedFeeder {
     bytes32 public mrEnclaveExpected = 0x4cb40e9053be3f8a7f54a5c46858fe44e37fc7fd66227b280a6f4b15afd947fd;
 
     constructor(
-        IAutomataDcapAttestationFee _sgx_quote_verifier
+        IAutomataDcapAttestationFee _sgxQuoteVerifier
     ) {
-        sgx_quote_verifier = _sgx_quote_verifier;
+        sgxQuoteVerifier = _sgxQuoteVerifier;
         owner = msg.sender;
     }
 
-    function mrEnclaveUpdate(bytes32 mrEnclaveNew) public {
+    function mrEnclaveUpdate(bytes32 mrEnclaveNew) external {
         require (msg.sender == owner, "only contract owner can call mrEnclaveUpdate");
         mrEnclaveExpected = mrEnclaveNew;
+    }
+
+    function quoteVerifierUpdate(address newQuoteVerifierAddress) external {
+        require (msg.sender == owner, "only contract owner can call quoteVerifierUpdate");
+        sgxQuoteVerifier = IAutomataDcapAttestationFee(newQuoteVerifierAddress);
     }
 
     function transferStorage(string calldata pair_name, address newFeederAddress) external {
@@ -69,7 +74,7 @@ contract DataFeedFeeder {
         bytes calldata sgx_verification_seal
     ) external payable {
 
-        (bool success, bytes memory output) = sgx_quote_verifier.verifyAndAttestWithZKProof{value: msg.value}(sgx_verification_journal, 1, sgx_verification_seal);
+        (bool success, bytes memory output) = sgxQuoteVerifier.verifyAndAttestWithZKProof{value: msg.value}(sgx_verification_journal, 1, sgx_verification_seal);
         if (!success) {
             // fail returns bytes(error_string)
             // success returns custom output type:
@@ -86,7 +91,7 @@ contract DataFeedFeeder {
         bytes calldata sgx_quote
     ) external payable {
 
-        (bool success, bytes memory output) = sgx_quote_verifier.verifyAndAttestOnChain{value: msg.value}(sgx_quote);
+        (bool success, bytes memory output) = sgxQuoteVerifier.verifyAndAttestOnChain{value: msg.value}(sgx_quote);
         if (!success) {
             // fail returns bytes(error_string)
             // success returns custom output type:
