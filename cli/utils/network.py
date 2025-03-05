@@ -40,6 +40,12 @@ def run_subprocess(_command, what):
         print("stderr:", result.stderr)
         sys.exit(1)
 
+def get_proxy_address(net):
+    file = open(address_path(net, "proxy"), 'r')
+    proxy_address = file.readline().strip()
+    file.close()
+
+    return proxy_address
 
 
 def get_feeder_address(net):
