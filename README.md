@@ -52,12 +52,23 @@ source .env
 
 8. There is a CLI for interactions with the deployed endpoint.
 
+There are three contracts: proxy, feeder and storage.
+Storage contract stores price data, every pair has its own storage. Only owner can upload data to storages.
+Feeder contract owns all storage contracts. It receives proofs, verifies them and uploads data to storages after verification. It guarantees that only proven data is stored in storage contracts.
+Proxy contract contains list of all pairs and storage addresses. It has predetermined address on all chains because CREATE2 insrtuction is used for deployment. Deployed only once.
+
+
 Deploy (example for the local network):
+For the first time you will need to deploy proxy, skip this step if you are redeploying feeder:
+```
+python3 cli/delpoy_proxy.py -n local
+```
+then deploy feeder:
 ```
 python3 cli/delpoy_feeder.py -n local
 ```
 
-Parse price data (example for the local network, on-chain zk verification and proving with bonsai):
+Parse price data (example for the local network, off-chain verification and proving with bonsai):
 ```
 python3 cli/parse_and_prove.py -n local --binance-zk-bonsai
 ```

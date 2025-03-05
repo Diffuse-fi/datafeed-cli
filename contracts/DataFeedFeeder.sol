@@ -23,6 +23,8 @@ import "./DataFeedStorage.sol";
 contract DataFeedFeeder {
     IAutomataDcapAttestationFee public sgxQuoteVerifier;
 
+    address public dataFeedProxyAddress;
+
     address public immutable owner;
 
     mapping (string => DataFeedStorage) public dataFeedStorages;
@@ -53,6 +55,11 @@ contract DataFeedFeeder {
         require (msg.sender == owner, "only contract owner can call transferStorage");
         DataFeedFeeder(newFeederAddress).setExistingPair(pair_name, address(dataFeedStorages[pair_name]));
         dataFeedStorages[pair_name].transferOwnership(newFeederAddress);
+    }
+
+    function setProxy(address proxyAddress) external {
+        require (msg.sender == owner, "only contract owner can call setProxy");
+        dataFeedProxyAddress = proxyAddress;
     }
 
     // enclaveReport starts at ENCLAVE_REPORT_OFFSET_OUTPUT-th byte of the verification output
