@@ -70,6 +70,16 @@ def manage_storage_contract(net, prev_feeder, new_feeder, pair_name):
         run_subprocess(new_deployment_command, "Deploy storage contract for " + pair_name + " pair")
 
 
+def set_proxy(net, feeder):
+    cmd = ["cast", "send", feeder, "setProxy(address)", get_proxy_address(net), "--rpc-url=" + net.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
+    run_subprocess(cmd, "Set proxy for " + feeder)
+
+    cmd = ["cast", "send", get_proxy_address(net), "updateFeeder(address)", feeder, "--rpc-url=" + net.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
+    run_subprocess(cmd, "proxy updateFeeder")
+
+
+
+
 def main():
     parser = argparse.ArgumentParser(description="Data feeder parameters")
     parser.add_argument('-n', '--network', type=network_class, required=True, help="Choose network (local, sepolia, eth_mainnet, neon_devnet)")
@@ -83,6 +93,8 @@ def main():
     new_feeder = get_feeder_address(args.network)
     print("previous_feeder:", previous_feeder)
     print("new_feeder:", new_feeder)
+
+    set_proxy(args.network, new_feeder)
 
     for pair_name in all_pairs:
         manage_storage_contract(args.network, previous_feeder, new_feeder, pair_name)
