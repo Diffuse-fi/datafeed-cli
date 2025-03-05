@@ -51,6 +51,8 @@ def deploy_data_feeder(net):
     print("wrote feeder address to", address_path(net, "feeder"), "\n======================================")
     file.close()
 
+    set_proxy(net, data_feeder_address)
+
 
 def manage_storage_contract(net, prev_feeder, new_feeder, pair_name):
     ownership_transfer_command = [ "cast", "send", prev_feeder, 'transferStorage(string calldata pair_name, address newFeederAddress)', pair_name, new_feeder, "--rpc-url=" + net.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
@@ -68,6 +70,16 @@ def manage_storage_contract(net, prev_feeder, new_feeder, pair_name):
                 print("new_feeder already owns storage of", pair_name)
     else:
         run_subprocess(new_deployment_command, "Deploy storage contract for " + pair_name + " pair")
+
+
+def set_proxy(net, feeder):
+    cmd = ["cast", "send", feeder, "setProxy(address)", get_proxy_address(net), "--rpc-url=" + net.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
+    run_subprocess(cmd, "Set proxy for " + feeder)
+
+    cmd = ["cast", "send", get_proxy_address(net), "updateFeeder(address)", feeder, "--rpc-url=" + net.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
+    run_subprocess(cmd, "proxy updateFeeder")
+
+
 
 
 def main():
