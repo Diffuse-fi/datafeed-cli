@@ -51,6 +51,8 @@ def deploy_data_feeder(net):
     print("wrote feeder address to", address_path(net, "feeder"), "\n======================================")
     file.close()
 
+    set_proxy(net, data_feeder_address)
+
 
 def manage_storage_contract(net, prev_feeder, new_feeder, pair_name):
     ownership_transfer_command = [ "cast", "send", prev_feeder, 'transferStorage(string calldata pair_name, address newFeederAddress)', pair_name, new_feeder, "--rpc-url=" + net.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
@@ -93,8 +95,6 @@ def main():
     new_feeder = get_feeder_address(args.network)
     print("previous_feeder:", previous_feeder)
     print("new_feeder:", new_feeder)
-
-    set_proxy(args.network, new_feeder)
 
     for pair_name in all_pairs:
         manage_storage_contract(args.network, previous_feeder, new_feeder, pair_name)

@@ -40,6 +40,13 @@ def add_pair(pair_name):
             file.write("\n")
         file.write(pair_name + "\n")
 
+    #TODO: would be great to run manage_storage_contract on all chains but simple
+    # for n in networks:
+    #     manage_storage_contract(n, None, feeder, pair)
+    # will have ploblems if fails on any of the chains. Need to figure out later,
+    # now I don't think we need to add single pairs to already deployed feeders
+    # automatically on all chains
+
 
 def main():
     parser = argparse.ArgumentParser(description="New pair addition parameters")
