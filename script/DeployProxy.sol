@@ -19,8 +19,7 @@ pragma solidity ^0.8.20;
 import {Script} from "forge-std/Script.sol";
 import "forge-std/Test.sol";
 
-import {IAutomataDcapAttestationFee} from "contracts/IAutomataDcapAttestationFee.sol";
-import {DataFeedFeeder} from "../contracts/DataFeedFeeder.sol";
+import {DataFeedProxy} from "../contracts/DataFeedProxy.sol";
 
 /// @notice Deployment script for the diffuse datafeed contracts.
 /// @dev Use the following environment variable to control the deployment:
@@ -33,9 +32,7 @@ import {DataFeedFeeder} from "../contracts/DataFeedFeeder.sol";
 ///
 /// https://book.getfoundry.sh/tutorials/solidity-scripting
 /// https://book.getfoundry.sh/reference/forge/forge-script
-contract DataFeedFeederDeploy is Script {
-
-   IAutomataDcapAttestationFee sgx_quote_verifier;
+contract DataFeedProxyDeploy is Script {
 
     function run() external {
         // Read and log the chainID
@@ -59,15 +56,8 @@ contract DataFeedFeederDeploy is Script {
             vm.startBroadcast(deployerAddr);
         }
 
-
-        // Deploy the application contract.
-        address sgx_quote_verifier_address = vm.envAddress("DCAP_ATTESTATION");
-        sgx_quote_verifier = IAutomataDcapAttestationFee(sgx_quote_verifier_address);
-
-        DataFeedFeeder dataFeedFeeder = new DataFeedFeeder(
-            sgx_quote_verifier
-        );
-        console2.log("Deployed DataFeedFeeder to", address(dataFeedFeeder));
+        DataFeedProxy dataFeedProxy = new DataFeedProxy{salt: 0}();
+        console2.log("Deployed DataFeedProxy to", address(dataFeedProxy));
 
         vm.stopBroadcast();
     }
