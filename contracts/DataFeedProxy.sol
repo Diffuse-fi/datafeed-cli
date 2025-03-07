@@ -26,7 +26,7 @@ contract DataFeedProxy {
     address public feeder;
 
     constructor() {
-        owner = msg.sender;
+        owner = tx.origin;
     }
 
 
