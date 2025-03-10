@@ -48,7 +48,7 @@ def fun(net):
 
 def main():
     parser = argparse.ArgumentParser(description="Data feeder parameters")
-    parser.add_argument('-n', '--network', type=network_class, required=True, help="Choose network (local, sepolia, eth_mainnet, neon_devnet)")
+    parser.add_argument('-n', '--network', type=network_class, required=True, help="Choose network (" + networks_str + ")")
     args = parser.parse_args()
     fun(args.network)
 

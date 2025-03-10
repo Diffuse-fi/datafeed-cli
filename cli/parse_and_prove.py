@@ -58,7 +58,7 @@ def prepare_json (net, _test_data, _binance_onchain, _binance_zk_bonsai, _binanc
 def main():
     parser = argparse.ArgumentParser(description="Data feeder parameters")
 
-    parser.add_argument('-n', '--network', type=network_class, required=True, help="Choose network (local, sepolia, eth_mainnet, neon_devnet)")
+    parser.add_argument('-n', '--network', type=network_class, required=True, help="Choose network (" + networks_str + ")")
 
     data_source_group = parser.add_mutually_exclusive_group()
     data_source_group.add_argument('--test-data', action='store_true', help='Use already proven test set')
