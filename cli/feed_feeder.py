@@ -92,7 +92,7 @@ def feed_data(net, is_zk, trace):
 
 def main():
     parser = argparse.ArgumentParser(description="Data feeder parameters")
-    parser.add_argument('-n', '--network', type=network_class, required=True, help="Choose network (local, sepolia, eth_mainnet, neon_devnet)")
+    parser.add_argument('-n', '--network', type=network_class, required=True, help="Choose network (" + networks_str + ")")
     parser.add_argument('--trace', action='store_true', default=False, help="Print trace level logs using 'cast call --trace'")
 
     parser.add_argument('--zk', action='store_true', default=False, help="Use risc0 groth16 proof of quote verification")

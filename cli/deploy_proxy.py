@@ -1,4 +1,3 @@
-import subprocess
 import sys
 import os
 from utils.network import *
@@ -23,9 +22,6 @@ def are_you_sure_not_local(net):
 
 def set_deployment_command(net):
     deployment_command = ["forge", "script", '--rpc-url=' + net.rpc_url, '--chain-id=' + net.chain_id, "--broadcast", "script/DeployProxy.sol"]
-    if net == NEON_DEVNET:
-        deployment_command.append("--legacy") # disables some new unsupported in NeonEVM features, must use in Neon
-        deployment_command.append("--skip-simulation") # parameter skips the on-chain simulation which doesn't work on Neon EVM , must use in Neon
     return deployment_command
 
 
@@ -51,7 +47,7 @@ def deploy_proxy(net):
 
 def main():
     parser = argparse.ArgumentParser(description="datafeed proxy parameters")
-    parser.add_argument('-n', '--network', type=network_class, required=True, help="Choose network (local, sepolia, eth_mainnet, neon_devnet)")
+    parser.add_argument('-n', '--network', type=network_class, required=True, help="Choose network (" + networks_str + ")")
 
     args = parser.parse_args()
 
