@@ -4,7 +4,7 @@ import requests
 
 
 def check_if_binance_has_this_pair(pair_name):
-    BASE_URL = "https://data-api.binance.vision/"
+    BASE_URL = "https://data-api.binance.vision"
 
     endpoint = f"{BASE_URL}/api/v3/ticker/price?symbol=" + pair_name
     response = requests.get(endpoint)
