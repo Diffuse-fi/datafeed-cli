@@ -38,7 +38,7 @@ def prepare_json (net, _test_data, _binance_onchain, _binance_zk_bonsai, _binanc
         parse_env_var(net, DCAP_ATTESTATION, root="lib/sgx_verifier_deployer/")
         os.environ["RPC_URL"] = net.rpc_url
 
-        run_subprocess(["./lib/zktls-enclave/target/debug/app-template"], "request from binance using sgx")
+        run_subprocess(["./lib/zktls-enclave/target/debug/zktls-pairs"], "request from binance using sgx")
         for f in files_1:
             run_subprocess(["mv", f, new_data_dir + f], "move requested " + f + " to " + new_data_dir)
         if _binance_onchain == True:
