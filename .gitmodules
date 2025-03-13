@@ -1,6 +1,7 @@
 [submodule "lib/zktls-enclave"]
 	path = lib/zktls-enclave
 	url = ../../Diffuse-fi/zktls-enclave.git
+	branch = trading_pairs_file_configuration
 [submodule "lib/automata-dcap-zkvm-cli"]
 	path = lib/automata-dcap-zkvm-cli
 	url = ../../Diffuse-fi/automata-dcap-zkvm-cli.git
