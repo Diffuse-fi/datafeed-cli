@@ -47,7 +47,7 @@ def prepare_json(net, _test_data, _binance_onchain, _binance_zk_bonsai, _binance
         print("DEBUG: Listing files in current directory after SGX request:")
         run_subprocess(["ls", "-la"], "list directory contents for debugging")
         for f in files_1:
-            run_subprocess(["mv", f, new_data_dir + f], "move requested " + f + " to " + new_data_dir)
+            run_subprocess(["mv", "cli/test_data/0/" + f, new_data_dir + f], "move requested " + f + " to " + new_data_dir)
         if _binance_onchain == True:
             return
 
