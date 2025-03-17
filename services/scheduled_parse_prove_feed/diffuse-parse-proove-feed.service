@@ -1,0 +1,10 @@
+[Unit]
+Description=Diffuse Datafeed periodic job
+
+[Service]
+Type=oneshot
+User=ubuntu        ; <-- пользователь, от которого запускается скрипт
+Group=ubuntu       ; <-- группа, если нужно
+WorkingDirectory=/home/ubuntu/our_org/cron/diffuse-datafeed  ; <-- путь до репозитория
+EnvironmentFile=/home/ubuntu/our_org/cron/diffuse-datafeed/.env  ; <-- подключаем .env
+ExecStart=/bin/bash /home/ubuntu/our_org/cron/diffuse-datafeed/cron_feeder.sh
