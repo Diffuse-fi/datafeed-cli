@@ -39,11 +39,13 @@ def prepare_json(net, _test_data, _binance_onchain, _binance_zk_bonsai, _binance
         os.environ["RPC_URL"] = net.rpc_url
 
         app_cmd = ["./lib/zktls-enclave/target/debug/zktls-pairs"]
-
         if pairs_file_path:
             app_cmd += ["--pairs_file_path", pairs_file_path]
-
         run_subprocess(app_cmd, "request from binance using sgx")
+
+        print("DEBUG: Current working directory:", os.getcwd())
+        print("DEBUG: Listing files in current directory after SGX request:")
+        run_subprocess(["ls", "-la"], "list directory contents for debugging")
         for f in files_1:
             run_subprocess(["mv", f, new_data_dir + f], "move requested " + f + " to " + new_data_dir)
         if _binance_onchain == True:
