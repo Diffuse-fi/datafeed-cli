@@ -3,8 +3,8 @@ Description=Diffuse Datafeed periodic job
 
 [Service]
 Type=oneshot
-User=ubuntu        ; <-- пользователь, от которого запускается скрипт
-Group=ubuntu       ; <-- группа, если нужно
-WorkingDirectory=/home/ubuntu/our_org/cron/diffuse-datafeed  ; <-- путь до репозитория
-EnvironmentFile=/home/ubuntu/our_org/cron/diffuse-datafeed/.env  ; <-- подключаем .env
-ExecStart=/bin/bash /home/ubuntu/our_org/cron/diffuse-datafeed/cron_feeder.sh
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=PUT_YOUR_ABSOLUT_PATH_TO_DATAFEED_CLI_HERE  ;
+EnvironmentFile=PUT_YOUR_ABSOLUT_PATH_TO_DATAFEED_CLI_HERE/.env  ;
+ExecStart=PUT_YOUR_ABSOLUT_PATH_TO_DATAFEED_CLI_HERE/services/scheduled_parse_prove_feed/parse_and_prove_feed.sh
