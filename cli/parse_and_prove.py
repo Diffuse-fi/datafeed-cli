@@ -40,7 +40,7 @@ def prepare_json(net, _test_data, _binance_onchain, _binance_zk_bonsai, _binance
 
         app_cmd = ["./lib/zktls-enclave/target/debug/zktls-pairs"]
         if pairs_file_path:
-            app_cmd += ["--pairs_file_path", pairs_file_path]
+            app_cmd += ["--pairs-file-path", pairs_file_path]
         run_subprocess(app_cmd, "request from binance using sgx")
 
         for f in files_1:
@@ -70,7 +70,7 @@ def main():
     data_source_group.add_argument('--binance-zk-bonsai', action='store_true', help='Request data from binance and prove using bonsai (quite fast and checks proving process)')
     data_source_group.add_argument('--binance-zk-local', action='store_true', help='Request data from binance and prove locally (15 minutes but checks that local proving works)')
 
-    parser.add_argument('--pairs_file_path', type=str, required=False, help='Path to the pairs file')
+    parser.add_argument('--pairs-file-path', type=str, required=False, help='Path to the pairs file')
 
     args = parser.parse_args()
 
