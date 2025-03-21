@@ -13,7 +13,7 @@ from parse_and_prove import prepare_json
 
 from lib.sgx_verifier_deployer.script.utils.network import *
 
-def test(test_data, binance_zk_bonsai, binance_zk_local):
+def test(test_data, binance_zk_bonsai, binance_zk_local, pairs_file_path):
 
     assert test_data + binance_zk_bonsai + binance_zk_local == 1, "test requires exactly one flag"
 
@@ -64,7 +64,7 @@ def test(test_data, binance_zk_bonsai, binance_zk_local):
 
     step+=1
     print(f"step {step}: request and prove data from binance...")
-    prepare_json(LOCAL_NETWORK, False, False, binance_zk_bonsai, binance_zk_local)
+    prepare_json(LOCAL_NETWORK, False, False, binance_zk_bonsai, binance_zk_local, pairs_file_path)
 
     step+=1
     print(f"step {step}: Print traces of feeding execution(zk)...")
@@ -147,6 +147,8 @@ test_config.add_argument('--test-data', action='store_true', help='Use already p
 test_config.add_argument('--binance-zk-bonsai', action='store_true', help='Request data from binance and prove using bonsai (quite fast and checks proving process)')
 test_config.add_argument('--binance-zk-local', action='store_true', help='Request data from binance and prove locally (15 minutes but checks that local proving works)')
 
+parser.add_argument('--pairs_file_path', type=str, required=False, help='Path to the pairs file')
+
 args = parser.parse_args()
 
-test(args.test_data, args.binance_zk_bonsai, args.binance_zk_local)
+test(args.test_data, args.binance_zk_bonsai, args.binance_zk_local, args.pairs_file_path)
