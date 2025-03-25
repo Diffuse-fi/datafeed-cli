@@ -49,7 +49,7 @@ def test(test_data, binance_zk_bonsai, binance_zk_local):
 
     step+=1
     print(f"step {step}: request data from binance...")
-    prepare_json(LOCAL_NETWORK, False, True, False, False)
+    prepare_json(LOCAL_NETWORK, False, True, False, False, "pairs/test.txt")
 
     step+=1
     print(f"step {step}: Print traces of feeding execution...")
@@ -64,7 +64,7 @@ def test(test_data, binance_zk_bonsai, binance_zk_local):
 
     step+=1
     print(f"step {step}: request and prove data from binance...")
-    prepare_json(LOCAL_NETWORK, False, False, binance_zk_bonsai, binance_zk_local)
+    prepare_json(LOCAL_NETWORK, False, False, binance_zk_bonsai, binance_zk_local, "pairs/test.txt")
 
     step+=1
     print(f"step {step}: Print traces of feeding execution(zk)...")
@@ -103,7 +103,7 @@ def test(test_data, binance_zk_bonsai, binance_zk_local):
 
     step+=1
     print(f"step {step}: request data from binance...")
-    prepare_json(LOCAL_NETWORK, False, True, False, False)
+    prepare_json(LOCAL_NETWORK, False, True, False, False, None)
 
     step+=1
     print(f"step {step}: Print traces of feeding execution...")
@@ -119,7 +119,7 @@ def test(test_data, binance_zk_bonsai, binance_zk_local):
 
     step+=1
     print(f"step {step}: request and prove data from binance...")
-    prepare_json(LOCAL_NETWORK, False, False, binance_zk_bonsai, binance_zk_local)
+    prepare_json(LOCAL_NETWORK, False, False, binance_zk_bonsai, binance_zk_local, None)
 
     step+=1
     print(f"step {step}: Print traces of feeding execution(zk)...")

@@ -15,7 +15,7 @@ def find_latest_data():
             latest_data = max(latest_data, int(d))
     return latest_data
 
-def prepare_json (net, _test_data, _binance_onchain, _binance_zk_bonsai, _binance_zk_local):
+def prepare_json(net, _test_data, _binance_onchain, _binance_zk_bonsai, _binance_zk_local, pairs_file_path):
 
     assert _test_data + _binance_onchain + _binance_zk_bonsai + _binance_zk_local == 1, "exactly one of flags is required"
 
@@ -38,7 +38,11 @@ def prepare_json (net, _test_data, _binance_onchain, _binance_zk_bonsai, _binanc
         parse_env_var(net, DCAP_ATTESTATION, root="lib/sgx_verifier_deployer/")
         os.environ["RPC_URL"] = net.rpc_url
 
-        run_subprocess(["./lib/zktls-enclave/target/debug/zktls-pairs"], "request from binance using sgx")
+        cmd = ["./lib/zktls-enclave/target/debug/zktls-pairs"]
+        if pairs_file_path is not None:
+            cmd.append("--pairs-file-path=" + pairs_file_path)
+
+        run_subprocess(cmd, "request from binance using sgx")
         for f in files_1:
             run_subprocess(["mv", f, new_data_dir + f], "move requested " + f + " to " + new_data_dir)
         if _binance_onchain == True:
@@ -59,6 +63,7 @@ def main():
     parser = argparse.ArgumentParser(description="Data feeder parameters")
 
     parser.add_argument('-n', '--network', type=network_class, required=True, help="Choose network (" + networks_str + ")")
+    parser.add_argument('--pairs-file-path', type=str, help='path to file with pairs list to be requested (pairs/list.txt by default))')
 
     data_source_group = parser.add_mutually_exclusive_group()
     data_source_group.add_argument('--test-data', action='store_true', help='Use already proven test set')
@@ -68,7 +73,7 @@ def main():
 
     args = parser.parse_args()
 
-    prepare_json(args.network, args.test_data, args.binance_onchain, args.binance_zk_bonsai, args.binance_zk_local)
+    prepare_json(args.network, args.test_data, args.binance_onchain, args.binance_zk_bonsai, args.binance_zk_local, args.pairs_file_path)
 
 if __name__ == "__main__":
     main()
