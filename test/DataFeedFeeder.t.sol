@@ -6,12 +6,11 @@ import "../contracts/DataFeedFeeder.sol";
 import "../contracts/IAutomataDcapAttestationFee.sol";
 
 contract TestFeeder is Test {
-    IAutomataDcapAttestationFee public DummyVerifier;
-    DataFeedFeeder feeder = new DataFeedFeeder(DummyVerifier);
+    DataFeedFeeder feeder = new DataFeedFeeder();
 
 
     function setUpFeeder() public {
-        feeder = new DataFeedFeeder(DummyVerifier);
+        feeder = new DataFeedFeeder();
     }
 
     function testSetNewPair() public {
@@ -32,7 +31,7 @@ contract TestFeeder is Test {
     function testTransferStorage() public {
         feeder.setNewPair("pair1");
 
-        DataFeedFeeder newFeeder = new DataFeedFeeder(DummyVerifier);
+        DataFeedFeeder newFeeder = new DataFeedFeeder();
         feeder.transferStorage("pair1", address(newFeeder));
     }
 

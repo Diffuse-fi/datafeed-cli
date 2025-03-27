@@ -13,12 +13,12 @@ contract TestDataFeedStorage is Test {
         dataFeedStorage = new DataFeedStorage(DESC, DECIMALS);
     }
 
-    function testDescription() public {
+    function testDescription() public view {
         string memory result = dataFeedStorage.description();
         assertEq(result, DESC);
     }
 
-    function testDecimals() public {
+    function testDecimals() public view {
         uint8 result = dataFeedStorage.decimals();
         assertEq(result, DECIMALS);
     }
