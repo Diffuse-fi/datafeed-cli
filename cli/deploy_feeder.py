@@ -76,6 +76,24 @@ def set_proxy(net, feeder):
     run_subprocess(cmd, "proxy updateFeeder")
 
 
+def update_mrenclave(net):
+
+    feeder = get_feeder_address(net)
+    mrEnclaveNew = "0xac2544572a061f3e92d263a4824d21f9f3cb648db38cefaef11e2d68ae6ad853"
+    cmd = [ "cast", "send", feeder, 'mrEnclaveUpdate(bytes32 mrEnclaveNew)', mrEnclaveNew, "--rpc-url=" + net.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
+
+    run_subprocess(cmd, "update mrEnclave " + net.name)
+
+
+def update_verifier(net):
+    parse_env_var(net, DCAP_ATTESTATION, root="lib/sgx_verifier_deployer/")
+
+    feeder = get_feeder_address(net)
+    cmd = [ "cast", "send", feeder, 'quoteVerifierUpdate(address newQuoteVerifierAddress)', os.getenv("DCAP_ATTESTATION"), "--rpc-url=" + net.rpc_url, "--private-key=" + os.getenv('PRIVATE_KEY')]
+
+    run_subprocess(cmd, "update quote verifier " + net.name)
+
+
 
 
 def main():
@@ -94,6 +112,9 @@ def main():
 
     for pair_name in all_pairs:
         manage_storage_contract(args.network, previous_feeder, new_feeder, pair_name)
+
+    update_mrenclave(args.network)
+    update_verifier(args.network)
 
 
 if __name__ == "__main__":

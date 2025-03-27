@@ -9,10 +9,9 @@ import "../contracts/DataFeedProxy.sol";
 import "../contracts/IAutomataDcapAttestationFee.sol";
 
 contract TestIntegration is Test {
-    IAutomataDcapAttestationFee public DummyVerifier;
     DataFeedProxy proxy = new DataFeedProxy();
-    DataFeedFeeder oldFeeder = new DataFeedFeeder(DummyVerifier);
-    DataFeedFeeder newFeeder = new DataFeedFeeder(DummyVerifier);
+    DataFeedFeeder oldFeeder = new DataFeedFeeder();
+    DataFeedFeeder newFeeder = new DataFeedFeeder();
     address defaultSender = msg.sender;
 
     // create2 requires `owner = tx.origin` instead of `= msg.sender`
