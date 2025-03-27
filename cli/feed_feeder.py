@@ -88,7 +88,8 @@ def feed_data(net, is_zk, trace):
         result = subprocess.run(command)
         print(result.stdout)
     else:
-        run_subprocess(command, "DataFeeder feeding")
+        ret = run_subprocess(command, "DataFeeder feeding")
+        return ret
 
 def main():
     parser = argparse.ArgumentParser(description="Data feeder parameters")
