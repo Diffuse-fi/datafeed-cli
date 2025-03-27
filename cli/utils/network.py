@@ -1,6 +1,5 @@
 import os
 import subprocess
-import enum
 import argparse
 import sys
 from lib.sgx_verifier_deployer.script.utils.network import *
@@ -32,13 +31,14 @@ def run_subprocess(_command, what):
     exit_code = result.returncode
 
     if (exit_code == 0):
-        print("SUCCEEDED")
-        return(result.stdout)
+        status = "SUCCEEDED"
     else:
-        print("FAILED!")
-        print("stdout:", result.stdout)
-        print("stderr:", result.stderr)
-        sys.exit(1)
+        status = "FAILED!"
+    print(status)
+    print("stdout:", result.stdout)
+    print("stderr:", result.stderr)
+    ret = status + "\n" + result.stdout + "\n\n" + result.stderr
+    return ret
 
 def get_proxy_address(net):
     file = open(address_path(net, "proxy"), 'r')

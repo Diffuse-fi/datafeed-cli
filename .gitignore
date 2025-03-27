@@ -22,3 +22,5 @@ addresses/local/
 # logs
 cron_log.txt
 feeding_log.txt
+daily_report_log.txt
+logs/
