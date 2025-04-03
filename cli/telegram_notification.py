@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import argparse
 import subprocess
 import os
 import telebot
@@ -12,6 +13,7 @@ def send_message(msg):
 
     bot = telebot.TeleBot(TOKEN)
     bot.send_message(chatID, msg, disable_notification=True)
+
 
 def notify_health_problem(current_time):
     for net in networks:
@@ -30,26 +32,36 @@ def notify_health_problem(current_time):
         except:
             send_message(net, file_error = "unable to open log file " + logfile)
 
-def daily_report():
 
-    # report_day = datetime.today()
-    report_day = datetime.today() - timedelta(days=1)
-    date_str = report_day.strftime("%Y-%m-%d")
+def report_for_last_days(days):
 
-    health_report = f"health_report {date_str}:\n"
-    gas_report = f"gas_report {date_str}:\n"
-    token_report = f"token_report {date_str}:\n"
-    balance_report = f"balance_report {date_str}:\n"
-    budget_report = f"budget_report {date_str}:\n"
-    money_report = f"money_report {date_str}:\n"
+    date_strings = []
+
+    for i in range(days):
+        report_day = datetime.today() - timedelta(days=1) - timedelta(days=i)
+        date_str = report_day.strftime("%Y-%m-%d")
+        date_strings.append(date_str)
+
+    if len(date_strings) == 1:
+        report_peirod = date_strings[0]
+    else:
+        report_peirod = date_strings[-1] + " — " + date_strings[0]
+
+    health_report = f"health_report {report_peirod}:\n"
+    gas_report = f"gas_report {report_peirod}:\n"
+    token_report = f"token_report {report_peirod}:\n"
+    balance_report = f"balance_report {report_peirod}:\n"
+    budget_report = f"budget_report {report_peirod}:\n"
+    money_report = f"money_report {report_peirod}:\n"
     total_money_spent = 0
 
     logs_list = []
 
     with open('logs/logs_list.txt', 'r') as file:
         for line in file:
-            if date_str in line:
-                logs_list.append(line.strip())
+            for date_str in date_strings:
+                if date_str in line:
+                    logs_list.append(line.strip())
 
     for net in networks:
         if net == LOCAL_NETWORK:
@@ -124,12 +136,29 @@ def daily_report():
 
     money_report += f"total amount spent on all chains: {total_money_spent:.3g} USD"
 
-    final_report =  health_report + "\n\n" + money_report + "\n\n" + budget_report + "\n\n" + gas_report + "\n\n" + token_report + "\n\n" + balance_report + "\n\n"
+    final_report = ""
+    if days == 1:
+        final_report = "=== DIFFUSE DATAFEED DAILY REPORT ===\n\n"
+    if days == 7:
+        final_report = "=== DIFFUSE DATAFEED WEEKLY REPORT ===\n\n"
+
+    final_report +=  health_report + "\n\n" + money_report + "\n\n" + budget_report + "\n\n" + gas_report + "\n\n" + token_report + "\n\n" + balance_report + "\n\n"
 
     send_message(final_report)
 
-def main():
-    daily_report()
+
+def main(days):
+    report_for_last_days(days)
+
 
 if __name__ == "__main__":
-    main()
+
+    parser = argparse.ArgumentParser(description="Data feeder parameters")
+    parser.add_argument('-d', '--days-amount', type=int, help="Report for how many days, default value 1")
+    args = parser.parse_args()
+
+    days = 1
+    if args.days_amount is not None:
+        days = args.days_amount
+
+    main(days)
