@@ -67,7 +67,7 @@ def daily_report():
                     log = logfile.read()
             except:
                 unhealth += 1
-                break
+                continue
 
             if log.find("SUCCEEDED") == -1:
                 unhealth += 1
