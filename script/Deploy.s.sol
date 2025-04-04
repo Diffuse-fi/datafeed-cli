@@ -14,7 +14,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.20;
+pragma solidity 0.8.19;
 
 import {Script} from "forge-std/Script.sol";
 import "forge-std/Test.sol";

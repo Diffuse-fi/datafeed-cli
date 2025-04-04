@@ -1,6 +1,6 @@
 //SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.20;
+pragma solidity 0.8.19;
 
 // Automata's sgx_quote verifier.
 // Takes sgx quote and returns bool result reason for fail / custom data type for success.

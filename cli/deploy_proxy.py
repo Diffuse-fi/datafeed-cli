@@ -21,7 +21,7 @@ def are_you_sure_not_local(net):
 
 
 def set_deployment_command(net):
-    deployment_command = ["forge", "script", '--rpc-url=' + net.rpc_url, '--chain-id=' + net.chain_id, "--broadcast", "script/DeployProxy.sol"]
+    deployment_command = ["forge", "script", '--rpc-url=' + net.rpc_url, '--chain-id=' + net.chain_id, "--broadcast", "script/DeployProxy.sol", "--legacy"]
     return deployment_command
 
 
