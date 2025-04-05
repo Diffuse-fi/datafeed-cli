@@ -30,7 +30,7 @@ def notify_health_problem(current_time):
                 msg = fail_msg + "newtork: " + net.name + "\nlogs:\n" + log
                 send_message(msg)
         except:
-            send_message(net, file_error = "unable to open log file " + logfile)
+            send_message("unable to open log file " + logfile)
 
 
 def report_for_last_days(days):
@@ -101,7 +101,7 @@ def report_for_last_days(days):
         millions_of_gas_spent = gas_spent / (10**6)
         tokens_spent = tokens_spent / (10 ** 18)
         try:
-            days_until_out_of_money = int(balance / tokens_spent)
+            days_until_out_of_money = int(balance / tokens_spent) * days
         except:
             days_until_out_of_money = "error"
 
