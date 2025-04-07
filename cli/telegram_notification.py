@@ -81,7 +81,7 @@ def report_for_last_days(days):
                 unhealth += 1
                 continue
 
-            if log.find("SUCCEEDED") == -1:
+            if log.find("FAILED!") != -1:
                 unhealth += 1
             else:
                 health += 1
