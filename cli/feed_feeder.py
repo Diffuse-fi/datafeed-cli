@@ -88,7 +88,7 @@ def feed_data(net, is_zk, trace):
         result = subprocess.run(command)
         print(result.stdout)
     else:
-        ret = run_subprocess(command, "DataFeeder feeding")
+        ret = run_subprocess(command, "DataFeeder feeding " + net.name)
         return ret
 
 def main():
