@@ -147,6 +147,51 @@ def report_for_last_days(days):
     send_message(final_report)
 
 
+def bugs_report(days):
+
+    date_strings = []
+
+    for i in range(days):
+        report_day = datetime.today() - timedelta(days=1) - timedelta(days=i)
+        date_str = report_day.strftime("%Y-%m-%d")
+        date_strings.append(date_str)
+
+
+    if len(date_strings) == 1:
+        report_peirod = date_strings[0]
+    else:
+        report_peirod = date_strings[-1] + " — " + date_strings[0]
+
+    bug_report = "=== DIFFUSE DATAFEED BUG REPORT ===\n\n"
+    bug_report += "report_peirod:" + report_peirod + '\n'
+
+    logs_list = []
+
+    with open('logs/logs_list.txt', 'r') as file:
+        for line in file:
+            for date_str in date_strings:
+                if date_str in line:
+                    logs_list.append(line.strip())
+
+    for net in networks:
+        if net == LOCAL_NETWORK:
+            continue
+
+        for l in logs_list:
+            logname = "logs/" + net.dirname + l + ".txt"
+            try:
+                with open(logname, 'r') as logfile:
+                    log = logfile.read()
+            except:
+                continue
+
+            if log.find("FAILED!") != -1:
+                bug_report += logname + '\n'
+                bug_report += log + '\n'
+
+    send_message(bug_report)
+
+
 def main(days):
     report_for_last_days(days)
 
