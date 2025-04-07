@@ -76,6 +76,10 @@ def feed_data(net, is_zk, trace):
         prices,
         timestamps
     ]
+
+    if net == SONIC_MAINNET: # fails with "gas required exceeds allowance (9980000)" error without this flag
+        command.append("--gas-limit=20000000")
+
     if is_zk == True:
         command.append(hex_sgx_verification_journal)
         command.append(hex_sgx_verification_seal)
