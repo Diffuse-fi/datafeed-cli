@@ -38,8 +38,7 @@ def text_array_from_binary_file(filename, isdigit):
     return array
 
 
-def feed_data(net, is_zk, trace):
-    latest_data_dir = "data/" + str(find_latest_data()) + "/"
+def feed_data(net, is_zk, trace, latest_data_dir="data/" + str(find_latest_data()) + "/"):
 
     pairs = text_array_from_binary_file(latest_data_dir + "pairs.bin", False)
     prices = text_array_from_binary_file(latest_data_dir + "prices.bin", True)
@@ -90,9 +89,10 @@ def feed_data(net, is_zk, trace):
         command[1] = "call"
         command.append("--trace")
         result = subprocess.run(command)
+        print("DataFeeder feeding data from " + latest_data_dir + ", network " + net.name + "result:")
         print(result.stdout)
     else:
-        ret = run_subprocess(command, "DataFeeder feeding " + net.name)
+        ret = run_subprocess(command, "DataFeeder feeding data from " + latest_data_dir + ", network " + net.name)
         return ret
 
 def main():
