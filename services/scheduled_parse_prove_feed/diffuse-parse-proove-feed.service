@@ -1,0 +1,9 @@
+[Unit]
+Description=Diffuse Datafeed periodic job
+
+[Service]
+Type=oneshot
+User=PUT_YOUR_USER_HERE
+WorkingDirectory=PUT_YOUR_ABSOLUT_PATH_TO_DATAFEED_CLI_HERE  ;
+EnvironmentFile=PUT_YOUR_ABSOLUT_PATH_TO_DATAFEED_CLI_HERE/services/scheduled_parse_prove_feed/.env  ;
+ExecStart=PUT_YOUR_ABSOLUT_PATH_TO_DATAFEED_CLI_HERE/services/scheduled_parse_prove_feed/parse_and_prove_feed.sh

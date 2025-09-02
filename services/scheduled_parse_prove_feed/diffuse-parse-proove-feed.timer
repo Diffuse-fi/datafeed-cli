@@ -1,0 +1,11 @@
+[Unit]
+Description=Runs Diffuse Datafeed job every 5 seconds, sequentially
+
+[Timer]
+OnBootSec=5
+OnUnitActiveSec=5
+AccuracySec=1s
+Persistent=false
+
+[Install]
+WantedBy=timers.target
